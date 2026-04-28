@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('subjects', function (Blueprint $table) {
-            $table->enum('course_type', ['NEET', 'JEE', 'MHT-CET', 'REGULAR'])->default('REGULAR')->after('class_name');
-        });
+        // Handled in subsequent migration
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('subjects', function (Blueprint $table) {
-            $table->dropColumn('course_type');
-        });
+        // Handled in subsequent migration
     }
 };

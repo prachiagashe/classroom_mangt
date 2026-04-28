@@ -77,12 +77,16 @@ function openModal(modalId) {
     const backdrop = document.getElementById(modalId + '-backdrop');
     
     if (modal && backdrop) {
+        const content = modal.firstElementChild;
+        
         // Show modal with animation
         backdrop.classList.remove('opacity-0', 'pointer-events-none');
         backdrop.classList.add('opacity-100');
         
-        modal.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
-        modal.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+        if (content) {
+            content.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
+            content.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+        }
         
         // Lock body scroll
         document.body.style.overflow = 'hidden';
@@ -101,12 +105,16 @@ function closeModal(modalId) {
     const backdrop = document.getElementById(modalId + '-backdrop');
     
     if (modal && backdrop) {
+        const content = modal.firstElementChild;
+        
         // Hide modal with animation
         backdrop.classList.remove('opacity-100');
         backdrop.classList.add('opacity-0', 'pointer-events-none');
         
-        modal.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
-        modal.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+        if (content) {
+            content.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
+            content.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+        }
         
         // Restore body scroll
         document.body.style.overflow = '';

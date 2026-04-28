@@ -8,11 +8,14 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-900">My Schedule & Assignments</h1>
         <div class="flex gap-3">
-            <button onclick="openScheduleModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <button onclick="openAssignmentModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 font-semibold shadow-sm flex items-center gap-1.5 transition-all">
+                ➕ Add Assignment
+            </button>
+            <button onclick="openScheduleModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold shadow-sm flex items-center gap-1.5 transition-all">
                 ➕ Add Schedule
             </button>
-            <a href="{{ route('teacher.dashboard') }}" class="text-blue-600 hover:text-blue-800">
-                ← Back to Dashboard
+            <a href="{{ route('teacher.dashboard') }}" class="text-blue-600 hover:text-blue-800 flex items-center font-medium">
+                ← Back
             </a>
         </div>
     </div>
@@ -162,6 +165,111 @@
             </div>
         </div>
     </div>
+    <!-- SECTION: Created Assignments & Submissions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 mt-6 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📂 Published Assignments</h2>
+            <p class="text-sm text-gray-500 mt-1">Track student submissions and assign marks.</p>
+        </div>
+        
+        <div class="p-6">
+            @if($createdAssignments->isEmpty())
+                <div class="text-center py-12 text-gray-500">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    <p class="text-lg font-semibold">No assignments published yet</p>
+                    <p class="text-sm text-gray-400 mt-1">Use 'Add Assignment' to begin mapping coursework.</p>
+                </div>
+            @else
+                <div class="space-y-6">
+                    @foreach($createdAssignments as $assignment)
+                        <div class="border border-gray-150 rounded-xl overflow-hidden shadow-sm">
+                            <div class="p-5 bg-gray-50 border-b border-gray-150 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded">Class {{ $assignment->class_id }}</span>
+                                        <span class="bg-green-100 text-green-800 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded">{{ $assignment->subject }}</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-gray-900">{{ $assignment->title }}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">{{ \Illuminate\Support\Str::limit($assignment->description, 150) }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-gray-500">Due Date</p>
+                                    <p class="text-sm font-bold text-red-600">{{ \Carbon\Carbon::parse($assignment->due_date)->format('M d, Y') }}</p>
+                                    
+                                    <button onclick="toggleSubmissions('{{ $assignment->id }}')" class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 uppercase tracking-wider transition-colors">
+                                        View Submissions ({{ $assignment->submissions->count() }})
+                                        <svg id="arrow-{{ $assignment->id }}" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Submissions List -->
+                            <div id="submissions-{{ $assignment->id }}" class="hidden border-t border-gray-150 bg-white">
+                                @if($assignment->submissions->isEmpty())
+                                    <div class="p-6 text-center text-gray-500 text-sm">
+                                        No students have submitted this assignment yet.
+                                    </div>
+                                @else
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-sm text-gray-600">
+                                            <thead class="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider">
+                                                <tr>
+                                                    <th class="px-6 py-3">Student Name</th>
+                                                    <th class="px-6 py-3">File</th>
+                                                    <th class="px-6 py-3">Submitted At</th>
+                                                    <th class="px-6 py-3">Status</th>
+                                                    <th class="px-6 py-3">Marks</th>
+                                                    <th class="px-6 py-3 text-right">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-150">
+                                                @foreach($assignment->submissions as $submission)
+                                                    <tr class="hover:bg-gray-50 transition-colors">
+                                                        <td class="px-6 py-4 font-semibold text-gray-900">{{ optional($submission->student)->name ?? 'Student' }}</td>
+                                                        <td class="px-6 py-4">
+                                                            <a href="{{ asset('storage/' . $submission->file_path) }}" target="_blank" class="text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                                                                📄 View PDF
+                                                            </a>
+                                                        </td>
+                                                        <td class="px-6 py-4 text-xs text-gray-500">
+                                                            {{ \Carbon\Carbon::parse($submission->submitted_at)->format('M d, h:i A') }}
+                                                        </td>
+                                                        <td class="px-6 py-4">
+                                                            @if($submission->status === 'checked')
+                                                                <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">Checked</span>
+                                                            @else
+                                                                <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">Submitted</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="px-6 py-4 font-bold text-gray-900">
+                                                            {{ $submission->marks ?? 'Pending' }}
+                                                        </td>
+                                                        <td class="px-6 py-4 text-right">
+                                                            <form method="POST" action="{{ route('teacher.assignments.evaluate', $submission->id) }}" class="flex items-center justify-end gap-2">
+                                                                @csrf
+                                                                <input type="text" name="marks" required placeholder="Marks" class="w-20 text-sm px-2.5 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ $submission->marks }}">
+                                                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg uppercase tracking-wider transition-colors shadow-sm">
+                                                                    Save
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
 
 <!-- Schedule Modal -->
@@ -279,6 +387,106 @@
     </form>
 </x-modal>
 
+<!-- Create Assignment Modal -->
+<div id="assignmentModal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-50 animate-fade-in backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-150 w-full max-w-2xl mx-4 overflow-hidden transform transition-all duration-300 scale-100">
+        <div class="p-6 border-b border-gray-150 flex justify-between items-center bg-gray-50">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📝 Create Assignment</h2>
+                <p class="text-xs text-gray-500 mt-1">Directly publish coursework guidelines to students.</p>
+            </div>
+            <button onclick="closeAssignmentModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <form method="POST" action="{{ route('teacher.assignments.store') }}" class="p-6" enctype="multipart/form-data">
+            @csrf
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <!-- Class Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Class *</label>
+                    <select name="class" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Class</option>
+                        @foreach($classes as $class)
+                            <option value="{{ $class }}">{{ $class }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Section Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Section *</label>
+                    <select name="section" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Section</option>
+                        @foreach($sections as $section)
+                            <option value="{{ $section }}">{{ $section }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Subject Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Subject *</label>
+                    <select name="subject" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Subject</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject }}">{{ $subject }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="mb-4">
+                <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Assignment Title *</label>
+                <input type="text" name="title" required
+                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="e.g., Physics Chapter 5 Assignment">
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Description *</label>
+                <textarea name="description" rows="3" required
+                          class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Provide detailed instructions for the assignment..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- Due Date -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Due Date *</label>
+                    <input type="date" name="due_date" required
+                           class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Attachment -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">PDF Attachment *</label>
+                    <input type="file" name="attachment" accept=".pdf" required
+                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl">
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex gap-3 justify-end bg-gray-50 p-4 -mx-6 -mb-6 border-t border-gray-200">
+                <button type="button" onclick="closeAssignmentModal()"
+                        class="bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                    Publish Assignment
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 // Schedule management using localStorage
 let schedules = JSON.parse(localStorage.getItem('teacherSchedules')) || [];
@@ -292,6 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Open schedule modal
 function openScheduleModal(id = null) {
+    console.log('openScheduleModal called with id:', id);
     const form = document.getElementById('scheduleForm');
     const submitButton = document.getElementById('submitButtonText');
     
@@ -509,5 +718,38 @@ function showNotification(message) {
         notification.remove();
     }, 3000);
 }
+
+function openAssignmentModal() {
+    document.getElementById('assignmentModal').classList.remove('hidden');
+}
+
+function closeAssignmentModal() {
+    document.getElementById('assignmentModal').classList.add('hidden');
+}
+
+function toggleSubmissions(id) {
+    const el = document.getElementById('submissions-' + id);
+    const arrow = document.getElementById('arrow-' + id);
+    if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        el.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+// Auto-open assignment submissions based on query parameter
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const openId = urlParams.get('open');
+    if (openId) {
+        toggleSubmissions(openId);
+        const element = document.getElementById('submissions-' + openId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
 </script>
 @endsection

@@ -184,11 +184,11 @@
                 <tr>
                     <th>Roll No.</th>
                     <th>Student Name</th>
-                    <th class="text-center">Class</th>
-                    <th class="text-center">Admission Date</th>
-                    <th class="text-center">Fee Status</th>
-                    <th class="text-center">Fee Structure</th>
-                    <th class="text-center">Action</th>
+                    <th>Class</th>
+                    <th>Admission Date</th>
+                    <th>Fee Status</th>
+                    <th>Fee Structure</th>
+                    <th class="text-right">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -205,13 +205,13 @@
                             <span class="font-bold text-gray-900">{{ $admission->student_name }}</span>
                         </div>
                     </td>
-                    <td class="text-center">
+                    <td>
                         {{ $admission->class }}
                     </td>
-                    <td class="text-center">
+                    <td>
                         <span class="secondary-text">{{ \Carbon\Carbon::parse($admission->admission_date)->format('d M Y') }}</span>
                     </td>
-                    <td class="text-center">
+                    <td>
                         @if($admission->payment_mode == 'installment')
                             @if($admission->fee_status == 'pending installment')
                                 <span class="crm-badge crm-badge-warning">
@@ -242,14 +242,14 @@
                             @endif
                         @endif
                     </td>
-                    <td class="text-center">
-                        <div class="flex flex-col items-center">
+                    <td>
+                        <div class="flex flex-col">
                             <span class="font-bold text-gray-900">₹{{ number_format($admission->paid_amount) }}</span>
                             <span class="secondary-text">/ ₹{{ number_format($admission->total_fee) }}</span>
                         </div>
                     </td>
-                    <td class="text-center">
-                        <div class="flex justify-center items-center gap-2">
+                    <td class="text-right">
+                        <div class="flex justify-end items-center gap-2">
                             <a href="{{ route('enquiry.admissions.show', $admission->id) }}"
                                class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>

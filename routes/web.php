@@ -257,6 +257,9 @@ Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->name('teacher.')
     Route::get('/assignments/assignment', [App\Http\Controllers\Teacher\TeacherController::class, 'assignment'])->name('assignments.assignment');
     Route::get('/assignments/create', [App\Http\Controllers\Teacher\TeacherController::class, 'createAssignment'])->name('assignments.create');
     Route::post('/assignments', [App\Http\Controllers\Teacher\TeacherController::class, 'storeAssignment'])->name('assignments.store');
+    Route::post('/assignments/submissions/{id}/evaluate', [App\Http\Controllers\Teacher\TeacherController::class, 'evaluateSubmission'])->name('assignments.evaluate');
+    Route::get('/classes/{className}', [App\Http\Controllers\Teacher\TeacherController::class, 'classDetail'])->name('class.detail');
+    Route::delete('/assignments/{id}', [App\Http\Controllers\Teacher\TeacherController::class, 'destroyAssignment'])->name('assignments.destroy');
     
     // Schedule Management routes
     Route::get('/schedule/create', [ScheduleController::class, 'create'])->name('schedule.create');
@@ -286,9 +289,8 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/courses', [App\Http\Controllers\Student\StudentCourseController::class, 'index'])->name('courses');
     
     // Assignment Management
-    Route::get('/assignments', function() {
-        return view('students.assignments');
-    })->name('assignments');
+    Route::get('/assignments', [App\Http\Controllers\Student\AssignmentController::class, 'index'])->name('assignments');
+    Route::post('/assignments/{id}/submit', [App\Http\Controllers\Student\AssignmentController::class, 'submit'])->name('assignments.submit');
     
     // Schedule
     Route::get('/schedule', function() {
@@ -322,12 +324,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('/ptm/meetings', [App\Http\Controllers\Student\PTMController::class, 'index'])->name('student.ptm.meetings'); // Legacy route
     Route::get('/ptm/join/{id}', [App\Http\Controllers\Student\PTMController::class, 'joinMeeting'])->name('student.ptm.join');
     
-    // Unified Notification API routes
-    Route::prefix('api/notifications')->group(function () {
-        Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index']);
-        Route::post('/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
-        Route::get('/check-new', [\App\Http\Controllers\NotificationController::class, 'checkNew']);
-    });
+    // Unified Notification API routes moved to general auth group
 
     // Student notification API routes (kept for legacy support if needed, but header will use unified)
     Route::get('/api/notifications/ptm', [\App\Http\Controllers\Student\NotificationController::class, 'getPTMNotifications']);
@@ -354,6 +351,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/salary/pay/{id}', [App\Http\Controllers\Employee\SalaryController::class, 'paySalary'])->name('salary.pay');
     Route::put('/salary/update/{id}', [App\Http\Controllers\Employee\SalaryController::class, 'updatePayment'])->name('salary.update');
     Route::get('/salary/history/{employee_code}', [App\Http\Controllers\Employee\SalaryController::class, 'history'])->name('salary.history');
+
+    // Unified Notification API routes
+    Route::prefix('api/notifications')->group(function () {
+        Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index']);
+        Route::post('/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+        Route::get('/check-new', [\App\Http\Controllers\NotificationController::class, 'checkNew']);
+    });
 });
 
 // Academic Assignment routes
@@ -436,3 +440,4 @@ Route::middleware(['auth'])->prefix('calling')->name('calling.')->group(function
 
         Route::delete('/{id}', [CallingController::class, 'destroy'])->name('destroy');
     });
+

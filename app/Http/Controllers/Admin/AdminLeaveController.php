@@ -8,7 +8,6 @@ use App\Models\AttendanceRecord;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\Holiday;
-use App\Models\ClassAttendance;
 use App\Models\Admission;
 use App\Models\Employee\Employee;
 use App\Traits\SendsEmployeeEmails;
@@ -24,16 +23,66 @@ class AdminLeaveController extends Controller
      */
     public function index(Request $request)
     {
-        // For Leave Requests Tab
-        $leaveRequests = LeaveRequest::with('employee')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = LeaveRequest::with('employee');
 
-        // Summary Statistics
-        $totalRequests = $leaveRequests->count();
-        $pendingCount = $leaveRequests->where('status', 'pending')->count();
-        $approvedCount = $leaveRequests->where('status', 'approved')->count();
-        $rejectedCount = $leaveRequests->where('status', 'rejected')->count();
+        if ($request->filled('leave_id')) {
+            $query->orderByRaw('id = ? desc', [$request->get('leave_id')]);
+        }
+        
+        $query->orderBy('created_at', 'desc');
+
+        // Filter: Default to active (last 20 days or pending)
+        $leaveFilter = $request->get('leave_filter', 'active');
+        $twentyDaysAgo = now()->subDays(20)->toDateString();
+
+        if ($leaveFilter === 'active') {
+            $query->where(function ($q) use ($twentyDaysAgo, $request) {
+                $q->where('created_at', '>=', $twentyDaysAgo)
+                  ->orWhere('status', 'pending');
+                if ($request->filled('leave_id')) {
+                    $q->orWhere('id', $request->get('leave_id'));
+                }
+            });
+        } elseif ($leaveFilter === 'archived') {
+            $query->where('created_at', '<', $twentyDaysAgo)
+                  ->where('status', '!=', 'pending');
+        }
+
+        if ($request->filled('status_filter') && $request->get('status_filter') !== 'all') {
+            $query->where('status', $request->get('status_filter'));
+        }
+
+        if ($request->filled('quick_filter')) {
+            $quick = $request->get('quick_filter');
+            if ($quick === 'today') {
+                $query->whereDate('created_at', date('Y-m-d'));
+            } elseif ($quick === 'this-week') {
+                $query->whereBetween('created_at', [now()->startOfWeek()->toDateString(), now()->endOfWeek()->toDateString()]);
+            } elseif ($quick === 'emergency') {
+                $query->where(function($q) {
+                    $q->where('reason', 'like', '%emergency%')
+                      ->orWhere('leave_type', 'like', '%emergency%');
+                });
+            }
+        }
+
+        // Search by employee
+        if ($request->filled('search_employee')) {
+            $search = $request->get('search_employee');
+            $query->whereHas('employee', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('employee_code', 'like', "%{$search}%");
+            });
+        }
+
+        $leaveRequests = $query->paginate(10)->withQueryString();
+
+        // Summary Statistics (Global)
+        $totalRequests = LeaveRequest::count();
+        $pendingCount = LeaveRequest::where('status', 'pending')->count();
+        $approvedCount = LeaveRequest::where('status', 'approved')->count();
+        $rejectedCount = LeaveRequest::where('status', 'rejected')->count();
 
         // For Teacher Attendance Tab
         $date = $request->get('date', date('Y-m-d'));
@@ -87,6 +136,23 @@ class AdminLeaveController extends Controller
                 'status' => 'approved',
                 'admin_remark' => 'Bulk approved by admin'
             ]);
+
+            // Insert attendance records for leave days
+            $start = \Carbon\Carbon::parse($leaveRequest->start_date);
+            $end = \Carbon\Carbon::parse($leaveRequest->end_date);
+            
+            while ($start->lte($end)) {
+                AttendanceRecord::updateOrCreate(
+                    [
+                        'employee_code' => $leaveRequest->employee_code,
+                        'attendance_date' => $start->toDateString(),
+                    ],
+                    [
+                        'status' => 'leave'
+                    ]
+                );
+                $start->addDay();
+            }
 
             // Notify teacher
             $this->notifyTeacher($leaveRequest, 'approved');
@@ -226,7 +292,9 @@ class AdminLeaveController extends Controller
                 ->where('end_date', '>=', $date)
                 ->exists();
 
-            if ($onLeave) continue; // Skip if on leave
+            if ($onLeave) {
+                $status = 'leave';
+            }
 
             AttendanceRecord::updateOrCreate(
                 [
@@ -304,6 +372,23 @@ class AdminLeaveController extends Controller
             'status' => 'approved',
             'admin_remark' => 'Approved by admin'
         ]);
+
+        // Insert attendance records for leave days
+        $start = \Carbon\Carbon::parse($leaveRequest->start_date);
+        $end = \Carbon\Carbon::parse($leaveRequest->end_date);
+        
+        while ($start->lte($end)) {
+            AttendanceRecord::updateOrCreate(
+                [
+                    'employee_code' => $leaveRequest->employee_code,
+                    'attendance_date' => $start->toDateString(),
+                ],
+                [
+                    'status' => 'leave'
+                ]
+            );
+            $start->addDay();
+        }
 
         // Notify teacher
         $this->notifyTeacher($leaveRequest, 'approved');

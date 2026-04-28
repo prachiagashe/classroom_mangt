@@ -17,202 +17,192 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left Column - 2/3 width -->
-        <div class="lg:col-span-2 space-y-6">
-            
-            <!-- SECTION 0: Mark Today's Attendance -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-900">📅 Mark Today's Attendance</h2>
-                        <span class="text-sm text-gray-500">{{ date('d M Y, l') }}</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    @php
-                        $today = now()->toDateString();
-                        $teacher = \App\Models\Employee\Employee::where('email', auth()->user()->email)->first();
-                        $alreadyMarked = $teacher ? \App\Models\AttendanceRecord::where('employee_code', $teacher->employee_code)
-                            ->where('attendance_date', $today)
-                            ->first() : null;
-                    @endphp
-                    @if($alreadyMarked)
-                        <div class="text-center">
-                            <div class="bg-green-100 text-green-800 px-6 py-3 rounded-lg inline-flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                Attendance Marked as Present
-                            </div>
-                            <p class="text-sm text-gray-600 mt-2">Today's attendance has been recorded</p>
-                        </div>
-                    @else
-                        <div class="text-center">
-                            <form action="{{ route('teacher.attendance.mark') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-200 inline-flex items-center">
-                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    Mark Present
-                                </button>
-                            </form>
-                            <p class="text-sm text-gray-600 mt-2">Click to mark your attendance for today</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <!-- SECTION 1: Next Class (Dynamic) -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">🔔 Next Class</h2>
-                    <span id="nextClassCountdown" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium"></span>
-                </div>
-                <div id="nextClassInfo">
-                    <div class="text-center py-8">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    <!-- SECTION: Class Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        @foreach($assignedClasses as $class)
+            <div class="bg-white rounded-2xl shadow-md border border-gray-150 overflow-hidden">
+                <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold uppercase">Class {{ $class['name'] }}</h2>
+                        <svg class="w-8 h-8 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
-                        <p class="text-lg font-medium text-gray-600">No upcoming classes today</p>
-                        <p class="text-sm text-gray-500 mt-2">Check your schedule for tomorrow's classes</p>
+                    </div>
+                    <p class="text-blue-100 text-sm mt-1">Manage coursework & submissions</p>
+                </div>
+                <div class="p-6 grid grid-cols-2 gap-4 text-center">
+                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                        <span class="text-2xl font-black text-gray-800 block">{{ $class['student_count'] }}</span>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-500">Students</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                        <span class="text-2xl font-black text-gray-800 block">{{ $class['present_students'] }}</span>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-gray-500">Present Today</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 col-span-2 px-4 py-3 text-left">
+                        <span class="text-xs font-bold text-gray-500 block uppercase tracking-wider mb-1">Next Class</span>
+                        <div id="next-class-{{ $class['name'] }}">
+                            <span class="text-sm font-black text-gray-800 block">None Scheduled</span>
+                            <span class="text-xs text-gray-500 block">Check schedule later</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        @endforeach
+    </div>
 
-            <!-- SECTION 2: Today's Schedule (Dynamic) -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-900">📚 Today's Schedule</h2>
-                        <button onclick="refreshSchedule()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Refresh</button>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div id="todayScheduleList" class="space-y-4">
-                        <!-- Dynamic schedule will be loaded here -->
-                    </div>
-                    <div id="todayScheduleEmpty" class="text-center py-8 text-gray-500">
-                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <p class="text-lg font-medium">No classes scheduled today</p>
-                        <p class="text-sm mt-2">Enjoy your free day!</p>
-                    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Attendance Calendar -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-1.5">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    Attendance Calendar
+                </h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="changeAttendanceMonth(-1)" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span id="currentAttendanceMonth" class="text-sm font-bold text-gray-700 min-w-[100px] text-center"></span>
+                    <button onclick="changeAttendanceMonth(1)" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
                 </div>
             </div>
+            <div class="p-6">
+                <!-- Calendar Legend -->
+                <div class="flex flex-wrap gap-4 mb-4 text-xs font-bold justify-center">
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-green-500 rounded-full"></span> PRESENT</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-red-500 rounded-full"></span> ABSENT</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-yellow-500 rounded-full"></span> LEAVE</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span> HOLIDAY</div>
+                </div>
 
-            <!-- SECTION 3: Create Assignment -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">📝 Create Assignment</h2>
-                <p class="text-gray-600 mb-6">Create homework or assignments for your students.</p>
-                <a href="{{ route('teacher.assignments.create') }}" 
-                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors text-center block">
-                    Create New Assignment
+                <!-- Calendar Grid -->
+                <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                    @foreach(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $day)
+                        <div class="text-xs font-bold text-gray-400 py-1 uppercase tracking-wider">{{ $day }}</div>
+                    @endforeach
+                </div>
+                <div id="attendanceCalendarGrid" class="grid grid-cols-7 gap-1 text-center">
+                    <!-- Days will be inserted by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center">
+            <h2 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider text-center">⚡ Quick Links</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{{ route('teacher.assignments.assignment') }}" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs uppercase tracking-wider text-center py-3 rounded-xl transition-all">
+                    Schedules
+                </a>
+                <a href="{{ route('teacher.leaves.create') }}" class="bg-orange-50 hover:bg-orange-100 text-orange-700 font-bold text-xs uppercase tracking-wider text-center py-3 rounded-xl transition-all">
+                    Request Leave
                 </a>
             </div>
-
-            <!-- SECTION 4: Notifications -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-900">🔔 Notifications</h2>
-                        <span id="notificationCount" class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">0</span>
-                    </div>
-                </div>
-                <div class="p-6">
-                    <div id="notificationList" class="space-y-3">
-                        <!-- Dynamic notifications will be loaded here -->
-                    </div>
-                    <div id="notificationEmpty" class="text-center py-8 text-gray-500">
-                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <p class="text-lg font-medium">No new notifications</p>
-                        <p class="text-sm mt-2">You're all caught up!</p>
-                    </div>
-                </div>
-            </div>
         </div>
+        </div>
+    </div>
+</div>
 
-        <!-- Right Column - 1/3 width -->
-        <div class="space-y-6">
+<!-- Create Assignment Modal -->
+<div id="assignmentModal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-50 animate-fade-in backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-150 w-full max-w-2xl mx-4 overflow-hidden transform transition-all duration-300 scale-100">
+        <div class="p-6 border-b border-gray-150 flex justify-between items-center bg-gray-50">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">📝 Create Assignment</h2>
+                <p class="text-xs text-gray-500 mt-1">Directly publish coursework guidelines to students.</p>
+            </div>
+            <button onclick="closeAssignmentModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <form method="POST" action="{{ route('teacher.assignments.store') }}" class="p-6" enctype="multipart/form-data">
+            @csrf
             
-            <!-- SECTION 4: Quick Stats -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">📊 Quick Stats</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <!-- Class Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Class *</label>
+                    <select name="class" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Class</option>
+                        @foreach($classes as $class)
+                            <option value="{{ $class }}">{{ $class }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Today's Classes</span>
-                        <span id="todayClassesCount" class="font-semibold text-gray-900">0</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">This Week</span>
-                        <span id="weekClassesCount" class="font-semibold text-gray-900">0</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Total Scheduled</span>
-                        <span id="totalClassesCount" class="font-semibold text-gray-900">0</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-600">Pending Tasks</span>
-                        <span id="pendingTasksCount" class="font-semibold text-gray-900">0</span>
-                    </div>
+
+                <!-- Section Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Section *</label>
+                    <select name="section" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Section</option>
+                        @foreach($sections as $section)
+                            <option value="{{ $section }}">{{ $section }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Subject Selection -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Subject *</label>
+                    <select name="subject" required class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Select Subject</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject }}">{{ $subject }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
-            <!-- SECTION 5: Upcoming Holidays -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">🎉 Upcoming Holidays</h2>
+            <!-- Title -->
+            <div class="mb-4">
+                <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Assignment Title *</label>
+                <input type="text" name="title" required
+                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="e.g., Physics Chapter 5 Assignment">
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Description *</label>
+                <textarea name="description" rows="3" required
+                          class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Provide detailed instructions for the assignment..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- Due Date -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">Due Date *</label>
+                    <input type="date" name="due_date" required
+                           class="w-full text-sm px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div class="p-6">
-                    <div id="holidaysList" class="space-y-3">
-                        <!-- Dynamic holidays will be loaded here -->
-                    </div>
-                    <div id="holidaysEmpty" class="text-center py-4 text-gray-500">
-                        <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <p class="text-sm">No holidays in the next 30 days</p>
-                    </div>
+
+                <!-- Attachment -->
+                <div>
+                    <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">PDF Attachment *</label>
+                    <input type="file" name="attachment" accept=".pdf" required
+                           class="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-300 rounded-xl">
                 </div>
             </div>
 
-            <!-- SECTION 6: Quick Actions -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">⚡ Quick Actions</h2>
-                <div class="space-y-3">
-                    <a href="{{ route('teacher.assignments.assignment') }}" 
-                       class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors text-center block">
-                        📅 Manage Schedule
-                    </a>
-                    <a href="{{ route('teacher.assignments.create') }}" 
-                       class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors text-center block">
-                        📝 Create Assignment
-                    </a>
-                    <a href="{{ route('teacher.leaves.create') }}" 
-                       class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors text-center block">
-                        🏖️ Request Leave
-                    </a>
-                </div>
+            <!-- Form Actions -->
+            <div class="flex gap-3 justify-end bg-gray-50 p-4 -mx-6 -mb-6 border-t border-gray-150">
+                <button type="button" onclick="closeAssignmentModal()"
+                        class="bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                    Publish Assignment
+                </button>
             </div>
-
-            <!-- SECTION 7: Recent Activity -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">📈 Recent Activity</h2>
-                </div>
-                <div class="p-6">
-                    <div id="activityList" class="space-y-3">
-                        <!-- Dynamic activity will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -252,6 +242,59 @@ function testLeaveApprovalNotification() {
 function loadDashboardData() {
     loadTodaySchedule();
     updateStats();
+    updateClassCardsNextClass();
+}
+
+function updateClassCardsNextClass() {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    
+    // Group schedules by class
+    const classSchedules = {};
+    schedules.filter(s => s.date === today).forEach(s => {
+        if (!classSchedules[s.class]) {
+            classSchedules[s.class] = [];
+        }
+        classSchedules[s.class].push(s);
+    });
+    
+    Object.keys(classSchedules).forEach(className => {
+        const classScheds = classSchedules[className];
+        
+        // Filter upcoming
+        const upcoming = classScheds.filter(s => {
+            const scheduleTime = new Date(s.date + ' ' + s.start_time);
+            return scheduleTime > now;
+        }).sort((a, b) => a.start_time.localeCompare(b.start_time));
+        
+        // Find ongoing
+        const ongoing = classScheds.find(s => {
+            const start = new Date(s.date + ' ' + s.start_time);
+            const end = new Date(s.date + ' ' + s.end_time);
+            return start <= now && end >= now;
+        });
+        
+        const cardEl = document.getElementById(`next-class-${className}`);
+        if (cardEl) {
+            if (ongoing) {
+                cardEl.innerHTML = `
+                    <span class="text-sm font-black text-blue-600 block">${ongoing.subject} <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full uppercase ml-1 animate-pulse">Ongoing</span></span>
+                    <span class="text-xs text-gray-600 block">${formatTime(ongoing.start_time)} – ${formatTime(ongoing.end_time)}</span>
+                `;
+            } else if (upcoming.length > 0) {
+                const next = upcoming[0];
+                cardEl.innerHTML = `
+                    <span class="text-sm font-black text-gray-800 block">${next.subject}</span>
+                    <span class="text-xs text-gray-600 block">${formatTime(next.start_time)} – ${formatTime(next.end_time)}</span>
+                `;
+            } else {
+                cardEl.innerHTML = `
+                    <span class="text-sm font-bold text-gray-400 block">No more classes</span>
+                    <span class="text-xs text-gray-400 block">Done for today</span>
+                `;
+            }
+        }
+    });
 }
 
 // Load today's schedule
@@ -803,5 +846,101 @@ function showNotification(message) {
         notification.remove();
     }, 3000);
 }
+
+function openAssignmentModal() {
+    document.getElementById('assignmentModal').classList.remove('hidden');
+}
+
+function closeAssignmentModal() {
+    document.getElementById('assignmentModal').classList.add('hidden');
+}
+// Attendance Calendar JS
+let attendanceDate = new Date();
+const teacherRecords = @json($teacherRecords);
+const holidays = @json($holidays);
+
+function changeAttendanceMonth(direction) {
+    attendanceDate.setMonth(attendanceDate.getMonth() + direction);
+    updateAttendanceCalendar();
+}
+
+function updateAttendanceCalendar() {
+    const year = attendanceDate.getFullYear();
+    const month = attendanceDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const prevLastDay = new Date(year, month, 0);
+    
+    const firstDayIndex = firstDay.getDay();
+    const lastDayIndex = lastDay.getDay();
+    const nextDays = 7 - lastDayIndex - 1;
+    
+    document.getElementById('currentAttendanceMonth').textContent = attendanceDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    let daysHTML = '';
+    
+    // Previous month days
+    for (let x = firstDayIndex; x > 0; x--) {
+        daysHTML += `<div class="text-xs text-gray-300 py-2 border border-gray-50 bg-gray-50/50">${prevLastDay.getDate() - x + 1}</div>`;
+    }
+    
+    // Current month days
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        
+        // Find attendance record
+        const record = teacherRecords.find(r => r.attendance_date === dateStr);
+        // Find holiday
+        const holiday = holidays.find(h => h.holiday_date === dateStr);
+        
+        let styleStr = 'background-color: white; color: #1f2937;';
+        let statusIcon = '';
+        let tooltipText = '';
+
+        if (holiday) {
+            styleStr = 'background-color: #eff6ff; color: #1e40af;';
+            statusIcon = '<span style="color: #2563eb; font-size: 11px; font-weight: bold;">H</span>';
+            tooltipText = `Holiday: ${holiday.reason || 'Public Holiday'}`;
+        } else if (record) {
+            if (record.status === 'present') {
+                styleStr = 'background-color: #ecfdf5; color: #065f46;';
+                statusIcon = '<span style="color: #059669; font-size: 11px; font-weight: bold;">✔</span>';
+                tooltipText = 'Present';
+            } else if (record.status === 'absent') {
+                styleStr = 'background-color: #fef2f2; color: #991b1b;';
+                statusIcon = '<span style="color: #dc2626; font-size: 11px; font-weight: bold;">✖</span>';
+                tooltipText = 'Absent';
+            } else if (record.status === 'leave') {
+                styleStr = 'background-color: #fffbeb; color: #92400e;';
+                statusIcon = '<span style="color: #d97706; font-size: 11px; font-weight: bold;">L</span>';
+                tooltipText = 'On Leave';
+            }
+        }
+        
+        const isToday = new Date().toDateString() === new Date(year, month, i).toDateString();
+        const todayBorder = isToday ? 'border: 2px solid #3b82f6;' : 'border: 1px solid #f3f4f6;';
+        
+        daysHTML += `
+            <div style="${styleStr} ${todayBorder} border-radius: 8px;" 
+                 class="text-xs p-1.5 relative flex flex-col justify-between h-11 cursor-pointer transition-all hover:scale-105" 
+                 title="${tooltipText}">
+                <span style="font-weight: 800;">${i}</span>
+                <div class="flex justify-end items-end">${statusIcon}</div>
+            </div>
+        `;
+    }
+    
+    // Next month days
+    for (let j = 1; j <= nextDays; j++) {
+        daysHTML += `<div class="text-xs text-gray-300 py-2 border border-gray-50 bg-gray-50/50">${j}</div>`;
+    }
+    
+    document.getElementById('attendanceCalendarGrid').innerHTML = daysHTML;
+}
+
+// Call initially
+document.addEventListener('DOMContentLoaded', function() {
+    updateAttendanceCalendar();
+});
 </script>
 @endsection

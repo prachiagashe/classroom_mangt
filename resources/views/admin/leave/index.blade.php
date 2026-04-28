@@ -5,25 +5,16 @@
 @section('content')
 <style>
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes fadeOutDown {
-        from { opacity: 1; transform: translateY(0) scale(1); }
-        to { opacity: 0; transform: translateY(20px) scale(0.98); }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     @keyframes fadeIn {
-        from { opacity: 0; backdrop-filter: blur(0px); }
-        to { opacity: 1; backdrop-filter: blur(4px); }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
-    @keyframes fadeOut {
-        from { opacity: 1; backdrop-filter: blur(4px); }
-        to { opacity: 0; backdrop-filter: blur(0px); }
-    }
-    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-fade-out-down { animation: fadeOutDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    .animate-fade-out { animation: fadeOut 0.3s ease-in forwards; }
+    .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 0.3s ease-in forwards; }
+    .no-scroll { overflow: hidden !important; }
     
     .sticky-header th {
         position: sticky;
@@ -187,8 +178,8 @@
                 </div>
             </div>
 
-                <div class="overflow-x-auto rounded-xl border border-gray-200">
-                    <table class="crm-table w-full bg-white">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="px-6 py-3 text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider">Employee ID</th>
@@ -235,30 +226,36 @@
                                                     PUBLIC HOLIDAY
                                                 </span>
                                             @elseif($onLeave)
-                                                {{-- Leave (Approved) Badge --}}
-                                                <span class="px-4 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold border border-amber-200 shadow-sm">
-                                                    LEAVE
-                                                </span>
-                                            @elseif($record && ($record->status == 'present' || $record->status == 'absent'))
-                                                {{-- Existing Status Badge --}}
-                                                @if($record->status == 'present')
-                                                    <span class="px-5 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-200 shadow-sm uppercase">
-                                                        Present
+                                                {{-- Leave Badge + Disabled Buttons --}}
+                                                <div class="flex items-center gap-3">
+                                                    <span class="px-4 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold border border-amber-200 shadow-sm">
+                                                        LEAVE
                                                     </span>
-                                                @else
-                                                    <span class="px-5 py-1.5 bg-rose-100 text-rose-700 rounded-lg text-xs font-bold border border-rose-200 shadow-sm uppercase">
-                                                        Absent
-                                                    </span>
-                                                @endif
+                                                    <div class="flex gap-2 opacity-50">
+                                                        <button disabled class="px-4 py-1.5 bg-white border border-gray-300 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider cursor-not-allowed">
+                                                            Present
+                                                        </button>
+                                                        <button disabled class="px-4 py-1.5 bg-white border border-gray-300 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider cursor-not-allowed">
+                                                            Absent
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             @else
-                                                {{-- Action Buttons --}}
-                                                <div class="flex gap-2">
-                                                    <button onclick="markAttendanceAction('{{ $employee->employee_code }}', 'present')" 
-                                                        class="px-4 py-1.5 bg-white border border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm uppercase tracking-wider">
+                                                {{-- Present/Absent Buttons --}}
+                                                @php
+                                                    $currentStatus = $record ? $record->status : 'pending';
+                                                @endphp
+                                                <div class="flex gap-2" id="btn-group-{{ $employee->employee_code }}">
+                                                    <button id="btn-present-{{ $employee->employee_code }}" 
+                                                        onclick="markAttendanceAction('{{ $employee->employee_code }}', 'present')" 
+                                                        style="{{ $currentStatus == 'present' ? 'background-color: #10b981; color: white;' : 'background-color: white; color: #10b981; border: 1px solid #10b981;' }}"
+                                                        class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm uppercase tracking-wider">
                                                         Present
                                                     </button>
-                                                    <button onclick="markAttendanceAction('{{ $employee->employee_code }}', 'absent')" 
-                                                        class="px-4 py-1.5 bg-white border border-rose-600 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm uppercase tracking-wider">
+                                                    <button id="btn-absent-{{ $employee->employee_code }}" 
+                                                        onclick="markAttendanceAction('{{ $employee->employee_code }}', 'absent')" 
+                                                        style="{{ $currentStatus == 'absent' ? 'background-color: #ef4444; color: white;' : 'background-color: white; color: #ef4444; border: 1px solid #ef4444;' }}"
+                                                        class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm uppercase tracking-wider">
                                                         Absent
                                                     </button>
                                                 </div>
@@ -318,40 +315,72 @@
 
         <div class="w-full">
                 
-                <!-- Advanced Filter Bar -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                    <div class="flex flex-col gap-4">
-                        <!-- Search & Quick Filters -->
-                        <div class="flex flex-wrap items-center justify-between gap-4">
-                            <div class="relative flex-1 min-w-[300px]">
-                                <input type="text" id="leaveSearch" onkeyup="filterLeaveTable()"
-                                    placeholder="Search by teacher name..." 
-                                    class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent focus:bg-white focus:border-blue-500 rounded-xl transition-all outline-none text-sm font-medium">
-                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="quickFilter('today')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all">TODAY</button>
-                                <button onclick="quickFilter('this-week')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all">THIS WEEK</button>
-                                <button onclick="quickFilter('emergency')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all">EMERGENCY</button>
-                            </div>
-                        </div>
+                <form action="{{ route('admin.leave.index') }}" method="GET" id="leave-filter-form">
+                    <input type="hidden" name="tab" value="leaves">
+                    <input type="hidden" name="leave_filter" id="leave_filter_input" value="{{ request('leave_filter', 'active') }}">
+                    <input type="hidden" name="status_filter" id="status_filter_input" value="{{ request('status_filter', 'all') }}">
+                    <input type="hidden" name="quick_filter" id="quick_filter_input" value="{{ request('quick_filter') }}">
 
-                        <!-- Status & Action Bar -->
-                        <div class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-50 pt-4">
-                            <div class="flex bg-gray-100 p-1 rounded-xl">
-                                <button onclick="filterLeaves('all')" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-white shadow-sm text-blue-600">ALL</button>
-                                <button onclick="filterLeaves('pending')" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-700">PENDING</button>
-                                <button onclick="filterLeaves('approved')" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-700">APPROVED</button>
-                                <button onclick="filterLeaves('rejected')" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-500 hover:text-gray-700">REJECTED</button>
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+                        <div class="flex flex-col gap-4">
+                            <!-- Search & Quick Filters -->
+                            <div class="flex flex-wrap items-center justify-between gap-4">
+                                <div class="relative flex-1 min-w-[300px]">
+                                    <input type="text" name="search_employee" value="{{ request('search_employee') }}"
+                                        placeholder="Search by teacher name..." 
+                                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-transparent focus:bg-white focus:border-blue-500 rounded-xl transition-all outline-none text-sm font-medium">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="submitQuickFilter('today')" 
+                                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('quick_filter') == 'today' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white' }}">TODAY</button>
+                                    <button type="button" onclick="submitQuickFilter('this-week')" 
+                                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('quick_filter') == 'this-week' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white' }}">THIS WEEK</button>
+                                    <button type="button" onclick="submitQuickFilter('emergency')" 
+                                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('quick_filter') == 'emergency' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white' }}">EMERGENCY</button>
+                                </div>
                             </div>
 
-                            <div id="bulkActions" class="hidden flex items-center gap-3 animate-fade-in">
-                                <span id="selectedCount" class="text-xs font-bold text-gray-500">0 selected</span>
-                                <button onclick="handleBulkAction('approve')" class="px-4 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-green-700 transition-all">BULK APPROVE</button>
-                                <button onclick="handleBulkAction('reject')" class="px-4 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold shadow-md hover:bg-red-700 transition-all">BULK REJECT</button>
+                            <!-- Status & Action Bar -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-50 pt-4">
+                                <div class="flex bg-gray-100 p-1 rounded-xl">
+                                    <button type="button" onclick="submitStatusFilter('all')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('status_filter', 'all') == 'all' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">ALL</button>
+                                    <button type="button" onclick="submitStatusFilter('pending')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('status_filter') == 'pending' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">PENDING</button>
+                                    <button type="button" onclick="submitStatusFilter('approved')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('status_filter') == 'approved' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">APPROVED</button>
+                                    <button type="button" onclick="submitStatusFilter('rejected')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('status_filter') == 'rejected' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">REJECTED</button>
+                                </div>
+
+                                <!-- Archive Toggle -->
+                                <div class="flex bg-gray-100 p-1 rounded-xl">
+                                    <button type="button" onclick="submitLeaveFilter('active')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('leave_filter', 'active') == 'active' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">ACTIVE</button>
+                                    <button type="button" onclick="submitLeaveFilter('archived')" 
+                                        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('leave_filter') == 'archived' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">ARCHIVED</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </form>
+
+                <script>
+                function submitQuickFilter(filter) {
+                    const input = document.getElementById('quick_filter_input');
+                    input.value = input.value === filter ? '' : filter;
+                    document.getElementById('leave-filter-form').submit();
+                }
+                function submitStatusFilter(status) {
+                    document.getElementById('status_filter_input').value = status;
+                    document.getElementById('leave-filter-form').submit();
+                }
+                function submitLeaveFilter(filter) {
+                    document.getElementById('leave_filter_input').value = filter;
+                    document.getElementById('leave-filter-form').submit();
+                }
+                </script>
                 </div>
 
                 <!-- Leave Requests Table -->
@@ -375,9 +404,11 @@
                                 <tbody>
                                     @foreach($leaveRequests as $request)
                                         <tr class="leave-row 
+                                            @if(request('leave_id') == $request->id) bg-blue-50/50 border-2 border-blue-400 @endif
                                             @if($request->leave_type === 'emergency') border-l-4 border-l-red-500
                                             @elseif($request->leave_type === 'sick') border-l-4 border-l-yellow-500
                                             @else border-l-4 border-l-blue-500 @endif" 
+                                            id="leave-request-{{ $request->id }}" 
                                             data-status="{{ $request->status }}"
                                             data-name="{{ strtolower($request->employee->full_name) }}"
                                             data-type="{{ strtolower($request->leave_type) }}"
@@ -414,7 +445,11 @@
                                                 <div class="secondary-text">{{ Carbon\Carbon::parse($request->start_date)->diffInDays(Carbon\Carbon::parse($request->end_date)) + 1 }} Days</div>
                                             </td>
                                             <td>
-                                                <p class="secondary-text truncate max-w-[150px]">{{ $request->reason }}</p>
+                                                <p class="secondary-text max-w-[250px] cursor-pointer hover:text-blue-600 transition-colors" 
+                                                    title="{{ $request->reason }}" 
+                                                    onclick="viewLeaveDetails(this.closest('tr').querySelector('button[title=\'View Details\']'))">
+                                                    {{ Str::limit($request->reason, 50, '...') }}
+                                                </p>
                                             </td>
                                             <td class="whitespace-nowrap">
                                                 <span class="crm-badge
@@ -447,6 +482,11 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="mt-4 px-4 py-3 bg-white border-t border-gray-100 flex items-center justify-between sm:px-6">
+                            {{ $leaveRequests->links() }}
                         </div>
                     @else
                         <div class="text-center py-20">
@@ -637,23 +677,15 @@ function switchModuleTab(tab) {
         atTab.classList.remove('border-transparent', 'text-gray-500');
         lvTab.classList.add('border-transparent', 'text-gray-500');
         lvTab.classList.remove('border-blue-600', 'text-blue-600');
-        
-        lvCon.classList.remove('animate-fade-in');
-        lvCon.classList.add('hidden');
-        
         atCon.classList.remove('hidden');
-        atCon.classList.add('animate-fade-in');
+        lvCon.classList.add('hidden');
     } else {
         lvTab.classList.add('border-blue-600', 'text-blue-600');
         lvTab.classList.remove('border-transparent', 'text-gray-500');
         atTab.classList.add('border-transparent', 'text-gray-500');
         atTab.classList.remove('border-blue-600', 'text-blue-600');
-        
-        atCon.classList.remove('animate-fade-in');
-        atCon.classList.add('hidden');
-        
         lvCon.classList.remove('hidden');
-        lvCon.classList.add('animate-fade-in');
+        atCon.classList.add('hidden');
         
         // Re-initialize calendar when switching to leaves tab
         if(typeof updateCalendar === 'function') updateCalendar();
@@ -793,36 +825,18 @@ function handleDateClick(date) {
 }
 
 function openHolidayModal() {
-    const modal = document.getElementById('holidayModal');
-    modal.classList.remove('animate-fade-out');
-    modal.classList.add('animate-fade-in');
-    
-    const container = modal.querySelector('.modal-container-ptm');
-    container.classList.remove('animate-fade-out-down');
-    container.classList.add('animate-fade-in-up');
-    
-    modal.style.display = 'flex';
+    document.getElementById('holidayModal').style.display = 'flex';
     document.body.classList.add('no-scroll');
     updateCalendar();
 }
 
 function closeHolidayModal() {
-    const modal = document.getElementById('holidayModal');
-    const container = modal.querySelector('.modal-container-ptm');
-    
-    modal.classList.remove('animate-fade-in');
-    modal.classList.add('animate-fade-out');
-    container.classList.remove('animate-fade-in-up');
-    container.classList.add('animate-fade-out-down');
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.classList.remove('no-scroll');
-        document.getElementById('holidayForm').reset();
-        document.getElementById('selectedHolidayDate').value = '';
-        document.getElementById('displayHolidayDate').value = '';
-        document.getElementById('saveHolidayBtn').disabled = true;
-    }, 280);
+    document.getElementById('holidayModal').style.display = 'none';
+    document.body.classList.remove('no-scroll');
+    document.getElementById('holidayForm').reset();
+    document.getElementById('selectedHolidayDate').value = '';
+    document.getElementById('displayHolidayDate').value = '';
+    document.getElementById('saveHolidayBtn').disabled = true;
 }
 
 // Holiday Form Submission
@@ -992,31 +1006,13 @@ function viewLeaveDetails(btn) {
         `;
     }
 
-    const modal = document.getElementById('leaveDetailModal');
-    modal.classList.remove('animate-fade-out');
-    modal.classList.add('animate-fade-in');
-    
-    const container = modal.querySelector('.modal-container-ptm');
-    container.classList.remove('animate-fade-out-down');
-    container.classList.add('animate-fade-in-up');
-
-    modal.style.display = 'flex';
+    document.getElementById('leaveDetailModal').style.display = 'flex';
     document.body.classList.add('no-scroll');
 }
 
 function closeLeaveDetailModal() {
-    const modal = document.getElementById('leaveDetailModal');
-    const container = modal.querySelector('.modal-container-ptm');
-    
-    modal.classList.remove('animate-fade-in');
-    modal.classList.add('animate-fade-out');
-    container.classList.remove('animate-fade-in-up');
-    container.classList.add('animate-fade-out-down');
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.classList.remove('no-scroll');
-    }, 280);
+    document.getElementById('leaveDetailModal').style.display = 'none';
+    document.body.classList.remove('no-scroll');
 }
 
 function handleSingleAction(id, action) {
@@ -1118,12 +1114,17 @@ function filterAttendanceTable() {
 
 // Mark Attendance Action (AJAX)
 function markAttendanceAction(employeeCode, status) {
-    const cell = document.getElementById(`attendance-cell-${employeeCode}`);
-    const originalContent = cell.innerHTML;
+    const btnPresent = document.getElementById(`btn-present-${employeeCode}`);
+    const btnAbsent = document.getElementById(`btn-absent-${employeeCode}`);
+    const row = document.querySelector(`.attendance-row[data-code="${employeeCode.toLowerCase()}"]`);
     const dateInput = document.getElementById('attendance_date');
     const date = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
 
-    cell.innerHTML = `<div class="flex justify-center"><svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>`;
+    if (!btnPresent || !btnAbsent) return;
+
+    // Disable buttons temporarily
+    btnPresent.disabled = true;
+    btnAbsent.disabled = true;
 
     fetch("{{ route('admin.leave.mark-single') }}", {
         method: "POST",
@@ -1136,69 +1137,74 @@ function markAttendanceAction(employeeCode, status) {
     .then(async response => {
         const data = await response.json();
         if (response.ok && data.success) {
-            cell.innerHTML = `
-                <div class="flex justify-center">
-                    <span class="px-5 py-1.5 ${status === 'present' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'} rounded-lg text-xs font-semibold border shadow-sm animate-fade-in">
-                        ${status.charAt(0).toUpperCase() + status.slice(1)}
-                    </span>
-                </div>`;
+            // Update row status
+            if (row) row.dataset.status = status;
+            
+            // Update buttons classes
+            if (status === 'present') {
+                btnPresent.style.backgroundColor = "#10b981";
+                btnPresent.style.color = "white";
+                btnPresent.style.border = "none";
+                
+                btnAbsent.style.backgroundColor = "white";
+                btnAbsent.style.color = "#ef4444";
+                btnAbsent.style.border = "1px solid #ef4444";
+            } else {
+                btnAbsent.style.backgroundColor = "#ef4444";
+                btnAbsent.style.color = "white";
+                btnAbsent.style.border = "none";
+                
+                btnPresent.style.backgroundColor = "white";
+                btnPresent.style.color = "#10b981";
+                btnPresent.style.border = "1px solid #10b981";
+            }
+            
             updateLiveCountsManual();
         } else {
-            cell.innerHTML = originalContent;
             alert("Error: " + (data.message || "Failed to mark attendance."));
         }
     })
     .catch(error => {
-        cell.innerHTML = originalContent;
+        console.error(error);
         alert("An error occurred.");
+    })
+    .finally(() => {
+        btnPresent.disabled = false;
+        btnAbsent.disabled = false;
     });
 }
 
 function updateLiveCountsManual() {
-    const cells = document.querySelectorAll('[id^="attendance-cell-"]');
+    const rows = document.querySelectorAll('.attendance-row');
     let present = 0, absent = 0, leave = 0;
 
-    cells.forEach(cell => {
-        const text = cell.innerText.trim();
-        if (text === 'Present') present++;
-        else if (text === 'Absent') absent++;
-        else if (text.includes('Leave')) leave++;
+    rows.forEach(row => {
+        const status = row.dataset.status;
+        if (status === 'present') present++;
+        else if (status === 'absent') absent++;
+        else if (status === 'leave') leave++;
     });
+
+    const isHoliday = document.querySelector('.attendance-row .bg-blue-100') !== null;
+    const holidayCount = isHoliday ? rows.length : 0;
 
     if(document.getElementById('count-present')) document.getElementById('count-present').textContent = present;
     if(document.getElementById('count-absent')) document.getElementById('count-absent').textContent = absent;
     if(document.getElementById('count-leave')) document.getElementById('count-leave').textContent = leave;
+    if(document.getElementById('count-holiday')) document.getElementById('count-holiday').textContent = holidayCount;
 }
 
 function openRejectModal(id) {
-    const modal = document.getElementById('rejectModal');
-    modal.classList.remove('animate-fade-out');
-    modal.classList.add('animate-fade-in');
-    
-    const container = modal.querySelector('.modal-container-ptm');
-    container.classList.remove('animate-fade-out-down');
-    container.classList.add('animate-fade-in-up');
-    
-    modal.style.display = 'flex';
+    document.getElementById('rejectModal').style.display = 'flex';
     document.body.classList.add('no-scroll');
     document.getElementById('rejectForm').action = "{{ route('admin.leave.reject', ':id') }}".replace(':id', id);
 }
 
 function closeRejectModal() {
-    const modal = document.getElementById('rejectModal');
-    const container = modal.querySelector('.modal-container-ptm');
-    
-    modal.classList.remove('animate-fade-in');
-    modal.classList.add('animate-fade-out');
-    container.classList.remove('animate-fade-in-up');
-    container.classList.add('animate-fade-out-down');
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.classList.remove('no-scroll');
-        const remarkInput = document.getElementById('admin_remark');
-        if(remarkInput) remarkInput.value = '';
-    }, 280);
+    document.getElementById('rejectModal').style.display = 'none';
+    document.body.classList.remove('no-scroll');
+    const remarkInput = document.getElementById('admin_remark');
+    if(remarkInput) remarkInput.value = '';
 }
 
 document.addEventListener('DOMContentLoaded', function() {

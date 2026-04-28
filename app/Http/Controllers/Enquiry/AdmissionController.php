@@ -183,17 +183,35 @@ class AdmissionController extends Controller
         $date = now()->toDateString();
         $className = $request->class_name;
 
+        $today = now();
+        $dayNum = $today->day;
+        $monthYear = $today->format('F Y');
+        $dayColumn = "day_{$dayNum}";
+
         foreach ($request->attendance as $att) {
-            \App\Models\ClassAttendance::updateOrCreate(
-                [
-                    'student_id' => $att['student_id'],
-                    'attendance_date' => $date,
-                ],
-                [
-                    'class_name' => $className,
-                    'attendance_status' => $att['attendance'],
-                ]
-            );
+            $student = \App\Models\Admission::find($att['student_id']);
+            if (!$student) continue;
+
+            $status = $att['attendance'] === 'present' ? 'P' : 'A';
+
+            $attendance = \App\Models\StudentAttendence::where('roll_no', $student->roll_number)
+                ->where('month', $monthYear)
+                ->first();
+
+            if ($attendance) {
+                $attendance->$dayColumn = $status;
+                $attendance->calculateStatistics();
+                $attendance->save();
+            } else {
+                $attendanceData = [
+                    'roll_no' => $student->roll_number,
+                    'name' => $student->student_name,
+                    'month' => $monthYear,
+                    $dayColumn => $status
+                ];
+                $newAttendance = \App\Models\StudentAttendence::create($attendanceData);
+                $newAttendance->calculateStatistics();
+            }
         }
 
         return response()->json([

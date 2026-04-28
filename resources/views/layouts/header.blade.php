@@ -220,7 +220,8 @@ async function loadNotifications() {
                 } else {
                     // Fallback legacy logic
                     if (notification.type === 'leave_request') {
-                        actionUrl = '/admin/leave?tab=leave_requests';
+                        let leaveId = notification.data && notification.data.leave_request_id ? notification.data.leave_request_id : '';
+                        actionUrl = `/admin/leave?tab=leaves&leave_id=${leaveId}`;
                     } else if (notification.type === 'leave_status') {
                         actionUrl = '/teacher/leaves';
                     } else if (notification.type === 'ptm') {

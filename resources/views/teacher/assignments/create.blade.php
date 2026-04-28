@@ -19,7 +19,7 @@
                 <p class="text-gray-600 mt-1">Create a new assignment for your students.</p>
             </div>
             
-            <form method="POST" action="{{ route('teacher.assignments.store') }}" class="p-6">
+            <form method="POST" action="{{ route('teacher.assignments.store') }}" class="p-6" enctype="multipart/form-data">
                 @csrf
                 
                 <!-- Class Selection -->
@@ -80,7 +80,7 @@
 
                 <!-- Attachment -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Attachment (Optional)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Assignment PDF File *</label>
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
@@ -88,13 +88,14 @@
                         <div class="mt-4">
                             <label for="attachment" class="cursor-pointer">
                                 <span class="mt-2 block text-sm font-medium text-gray-900">
-                                    Click to upload or drag and drop
+                                    Click to upload PDF
                                 </span>
                                 <span class="mt-1 block text-xs text-gray-500">
-                                    PDF, DOC, DOCX up to 10MB
+                                    PDF up to 10MB (Mandatory)
                                 </span>
                             </label>
-                            <input id="attachment" name="attachment" type="file" class="sr-only" accept=".pdf,.doc,.docx">
+                            <input id="attachment" name="attachment" type="file" class="sr-only" accept=".pdf" required onchange="document.getElementById('fileName').textContent = this.files[0] ? this.files[0].name : '';">
+                            <p id="fileName" class="mt-2 text-sm text-blue-600 font-semibold"></p>
                         </div>
                     </div>
                 </div>

@@ -15,7 +15,10 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
         $notifications = Notification::where('user_id', $user->id)
-            ->where('sender_id', '!=', $user->id)
+            ->where(function($q) use ($user) {
+                $q->where('sender_id', '!=', $user->id)
+                  ->orWhereNull('sender_id');
+            })
             ->where('is_read', false)
             ->orderBy('created_at', 'desc')
             ->take(5)
@@ -27,7 +30,10 @@ class NotificationController extends Controller
             });
 
         $unreadCount = Notification::where('user_id', $user->id)
-            ->where('sender_id', '!=', $user->id)
+            ->where(function($q) use ($user) {
+                $q->where('sender_id', '!=', $user->id)
+                  ->orWhereNull('sender_id');
+            })
             ->where('is_read', false)
             ->count();
 
@@ -66,7 +72,10 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
         $unreadCount = Notification::where('user_id', $user->id)
-            ->where('sender_id', '!=', $user->id)
+            ->where(function($q) use ($user) {
+                $q->where('sender_id', '!=', $user->id)
+                  ->orWhereNull('sender_id');
+            })
             ->where('is_read', false)
             ->count();
 

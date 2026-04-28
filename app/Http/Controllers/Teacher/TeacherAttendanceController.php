@@ -16,46 +16,7 @@ class TeacherAttendanceController extends Controller
      */
     public function markAttendance(Request $request)
     {
-        try {
-            // Get current teacher
-            $teacher = Employee::where('email', Auth::user()->email)->first();
-            
-            if (!$teacher) {
-                return redirect()->back()->with('error', 'Teacher record not found.');
-            }
-            
-            $today = now()->toDateString();
-            
-            // Check if attendance already marked
-            $existing = AttendanceRecord::where('employee_code', $teacher->employee_code)
-                ->where('attendance_date', $today)
-                ->first();
-                
-            if ($existing) {
-                return redirect()->back()->with('info', 'Attendance already marked for today.');
-            }
-            
-            // Create attendance record
-            AttendanceRecord::create([
-                'employee_code' => $teacher->employee_code,
-                'attendance_date' => $today,
-                'status' => 'present',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-            
-            // Store in session for immediate feedback
-            Session::put('teacher_attendance_' . $teacher->employee_code . '_' . $today, [
-                'marked' => true,
-                'status' => 'present',
-                'time' => now()->format('H:i:s')
-            ]);
-            
-            return redirect()->back()->with('success', 'Attendance marked successfully for today!');
-            
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to mark attendance: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('error', 'You are not allowed to directly mark attendance. Attendance is managed by Admin.');
     }
     
     /**
