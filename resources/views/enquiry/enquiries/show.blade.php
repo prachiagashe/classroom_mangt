@@ -72,11 +72,15 @@
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500">Class</label>
-                            <p class="text-gray-900 font-medium view-mode">{{ $enquiry->class ?? 'N/A' }}</p>
+                            <p class="text-gray-900 font-medium view-mode">{{ $enquiry->formatted_class }}</p>
                             <div class="edit-mode hidden mt-1">
                                 <select name="class" class="border rounded px-2 py-1 text-sm w-full">
-                                    @foreach(['5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'] as $cls)
-                                        <option value="{{ $cls }}" {{ old('class', $enquiry->class) == $cls ? 'selected' : '' }}>{{ $cls }} Class</option>
+                                    @foreach([
+                                        1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th',
+                                        6 => '6th', 7 => '7th', 8 => '8th', 9 => '9th', 10 => '10th',
+                                        11 => '11th', 12 => '12th'
+                                    ] as $val => $label)
+                                        <option value="{{ $val }}" {{ old('class', $enquiry->class) == $val ? 'selected' : '' }}>{{ $label }} Class</option>
                                     @endforeach
                                 </select>
                                 @error('class') <div class="text-red-600 text-xs mt-1">{{ $message }}</div> @enderror

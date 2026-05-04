@@ -98,14 +98,13 @@
         </label>
         <select name="class" required class="w-full border rounded px-3 py-2 {{ $errors->has('class') ? 'border-red-500' : '' }}">
             <option value="">Select Class</option>
-            <option value="5th" {{ old('class') == '5th' ? 'selected' : '' }}>5th Class</option>
-            <option value="6th" {{ old('class') == '6th' ? 'selected' : '' }}>6th Class</option>
-            <option value="7th" {{ old('class') == '7th' ? 'selected' : '' }}>7th Class</option>
-            <option value="8th" {{ old('class') == '8th' ? 'selected' : '' }}>8th Class</option>
-            <option value="9th" {{ old('class') == '9th' ? 'selected' : '' }}>9th Class</option>
-            <option value="10th" {{ old('class') == '10th' ? 'selected' : '' }}>10th Class</option>
-            <option value="11th" {{ old('class') == '11th' ? 'selected' : '' }}>11th Class</option>
-            <option value="12th" {{ old('class') == '12th' ? 'selected' : '' }}>12th Class</option>
+            @foreach([
+                1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th',
+                6 => '6th', 7 => '7th', 8 => '8th', 9 => '9th', 10 => '10th',
+                11 => '11th', 12 => '12th'
+            ] as $val => $label)
+                <option value="{{ $val }}" {{ old('class') == $val ? 'selected' : '' }}>{{ $label }} Class</option>
+            @endforeach
         </select>
         @error('class')
             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

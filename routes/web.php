@@ -57,6 +57,7 @@ Route::middleware('auth')
 
 
         // ================= ENQUIRIES =================
+        Route::post('enquiries/import', [EnquiryController::class, 'import'])->name('enquiries.import');
         Route::resource('enquiries', EnquiryController::class);
 
         Route::get('/enquiries/{enquiry}/details',

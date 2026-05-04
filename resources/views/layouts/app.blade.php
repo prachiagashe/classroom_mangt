@@ -164,7 +164,7 @@
         }
         
         .crm-badge-success { background-color: #dcfce7; color: #166534; }
-        .crm-badge-warning { background-color: #fef9c3; color: #854d0e; }
+        .crm-badge-warning { background-color: #fef3c7; color: #d97706; }
         .crm-badge-danger { background-color: #fee2e2; color: #991b1b; }
         .crm-badge-info { background-color: #dbeafe; color: #1e40af; }
         

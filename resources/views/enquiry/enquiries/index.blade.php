@@ -30,6 +30,13 @@
                     </svg>
                     Add Enquiry
                 </a>
+                <button onclick="openImportModal()"
+                  class="bg-green-600 text-white px-5 py-2.5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Import Excel
+                </button>
                 <div class="bg-blue-600 p-4 rounded-xl shadow-md">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -122,7 +129,7 @@
                 <th>Contact</th>
                 <th>Class</th>
                 <th>Source</th>
-                <th class="text-center">Status</th>
+                <th style="text-align: center;">Status</th>
                 <th>Date</th>
                 <th class="text-center">Actions</th>
             </tr>
@@ -157,7 +164,7 @@
 
             <!-- Class -->
             <td>
-                {{ $enquiry->class }}
+                {{ $enquiry->formatted_class }}
             </td>
 
             <!-- Source -->
@@ -177,10 +184,10 @@
             </td>
 
             <!-- Status -->
-           <td class="text-center">
+            <td style="text-align: center;">
                 <span class="crm-badge
                     @if($enquiry->status === 'new') crm-badge-info
-                    @elseif($enquiry->status === 'followup') crm-badge-warning
+                    @elseif($enquiry->status === 'followup' || $enquiry->status === 'follow-up') crm-badge-warning
                     @elseif($enquiry->status === 'confirmed') crm-badge-success
                     @elseif($enquiry->status === 'rejected') crm-badge-danger
                     @else crm-badge-info @endif">
@@ -278,7 +285,12 @@
     </table>
   </div>
 
-  <!-- Pagination Links Removed -->
+  <!-- Pagination Links -->
+  @if($enquiries->hasPages())
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-center">
+        {{ $enquiries->links() }}
+    </div>
+  @endif
 </div>
 </div>
 
@@ -582,6 +594,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <!-- FOLLOW UP MODAL and SCRPT END HERE -->
+
+<!-- IMPORT EXCEL MODAL -->
+<div id="importModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white w-[500px] rounded-2xl shadow-2xl p-8 relative">
+        <button onclick="closeImportModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        <h2 class="text-2xl font-semibold mb-4">Import Enquiries from Excel</h2>
+        <form action="{{ route('enquiry.enquiries.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Excel File (.xlsx, .xls)</label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                            <span class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                Upload a file
+                            </span>
+                            <p class="pl-1">or drag and drop</p>
+                        </div>
+                        <p id="fileName" class="text-xs text-gray-500">Excel files up to 2MB</p>
+                    </div>
+                </div>
+                <input id="fileInput" name="file" type="file" class="hidden" accept=".xlsx, .xls" onchange="updateFileName(this)">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeImportModal()" class="px-5 py-2.5 border rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all">Import Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openImportModal() {
+    document.getElementById('importModal').classList.remove('hidden');
+}
+function closeImportModal() {
+    document.getElementById('importModal').classList.add('hidden');
+}
+function updateFileName(input) {
+    if (input.files && input.files[0]) {
+        document.getElementById('fileName').innerText = input.files[0].name;
+    }
+}
+</script>
 
 
 

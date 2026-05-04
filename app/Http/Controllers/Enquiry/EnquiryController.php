@@ -7,14 +7,16 @@ use App\Models\Enquiry;
 use App\Services\NotificationService;
 use App\Traits\SendsAdmissionEmails;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\EnquiryImport;
 
 class EnquiryController extends Controller
 {
     use SendsAdmissionEmails;
     public function index()
     {
-        // Fetch enquiries
-        $enquiries = Enquiry::latest()->get();
+        // Fetch enquiries with pagination (10 per page)
+        $enquiries = Enquiry::latest()->paginate(10);
 
         return view('enquiry.enquiries.index', compact('enquiries'));
     }
@@ -601,6 +603,20 @@ public function update(Request $request, $id)
     }
 
     return redirect()->route('enquiry.enquiries.show', $id)->with('success', 'Enquiry updated successfully');
-}
+    }
 
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        try {
+            Excel::import(new EnquiryImport, $request->file('file'));
+            return redirect()->route('enquiry.enquiries.index')->with('success', 'Enquiries imported successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Enquiry Import Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error during import: ' . $e->getMessage());
+        }
+    }
 }

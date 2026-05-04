@@ -47,6 +47,8 @@ class Enquiry extends Model
         'source',
         'remarks',
         'parent_feedback',
+        'counselling_points',
+        'important_notes',
 
         'total_fees',
         'discount_fees',
@@ -65,6 +67,8 @@ class Enquiry extends Model
         'foundation' => 'array',
         'course' => 'array',
         'source' => 'array',
+        'counselling_points' => 'array',
+        'important_notes' => 'array',
 
         'dob' => 'date',
         'date' => 'date',
@@ -96,8 +100,26 @@ class Enquiry extends Model
     |--------------------------------------------------------------------------
     */
 
-//     public function getFullNameAttribute()
-//     {
-//         return trim("{$this->first_name} {$this->middle_name} {$this->surname}");
-//     }
+    public function getFormattedClassAttribute()
+    {
+        $value = $this->class;
+        if (empty($value)) return '-';
+
+        if (is_numeric($value)) {
+            $number = (int) $value;
+            // Handle special cases: 11, 12, 13 are always 'th'
+            if ($number % 100 >= 11 && $number % 100 <= 13) {
+                return $number . 'th';
+            }
+            // Standard ordinal rules
+            switch ($number % 10) {
+                case 1:  return $number . 'st';
+                case 2:  return $number . 'nd';
+                case 3:  return $number . 'rd';
+                default: return $number . 'th';
+            }
+        }
+
+        return $value;
+    }
 }

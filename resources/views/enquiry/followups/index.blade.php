@@ -171,7 +171,7 @@
                                     Status:
                                     <span class="status-badge px-2 py-1 rounded-full text-xs font-medium
                                         {{ $followUp->enquiry->status == 'new' ? 'bg-blue-100 text-blue-600' : '' }}
-                                        {{ $followUp->enquiry->status == 'follow-up' ? 'bg-yellow-100 text-yellow-600' : '' }}
+                                        {{ ($followUp->enquiry->status == 'follow-up' || $followUp->enquiry->status == 'followup') ? 'bg-yellow-100 text-yellow-700' : '' }}
                                         {{ $followUp->enquiry->status == 'confirmed' ? 'bg-green-100 text-green-600' : '' }}
                                         {{ $followUp->enquiry->status == 'rejected' ? 'bg-red-100 text-red-600' : '' }}">
                                         {{ ucfirst($followUp->enquiry->status) }}

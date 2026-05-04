@@ -92,24 +92,24 @@ class FollowUpController extends Controller
 
         $enquiry = Enquiry::findOrFail($request->enquiry_id);
 
-        FollowUp::create([
+        $followUp = FollowUp::create([
             'enquiry_id'    => $enquiry->id,
             'student_name'  => $enquiry->first_name . ' ' . $enquiry->surname,
             'followup_date' => $request->followup_date,
             'followup_time' => $request->followup_time,
             'type'          => $request->type,
-            // 'followup_type' => $request->type,
+            'followup_type' => $request->type,
             'notes'         => $request->notes,
-            // 'status'        => 'pending'
+            'status'        => 'pending'
+        ]);
+
+        // Update enquiry status immediately
+        $enquiry->update([
+            'status' => 'follow-up'
         ]);
 
         // WhatsApp Follow-Up Scheduled
         app(\App\Services\WhatsAppService::class)->sendMessage('follow_up_scheduled', $followUp);
-
-        // Update enquiry status
-        $enquiry->update([
-            'status' => 'follow-up'
-        ]);
 
         return response()->json([
             'success'  => true,
