@@ -568,6 +568,37 @@ public function update(Request $request, $id)
     }
     
     $enquiry->update($validated);
+    
+    // Sync with Admission model if it exists
+    $admission = \App\Models\Admission::where('enquiry_id', $enquiry->id)->first();
+    if ($admission) {
+        $studentName = trim(($validated['first_name'] ?? $enquiry->first_name) . ' ' . ($validated['middle_name'] ?? $enquiry->middle_name) . ' ' . ($validated['surname'] ?? $enquiry->surname));
+        
+        $admission->update([
+            'student_name' => $studentName,
+            'email' => $validated['email'] ?? $enquiry->email,
+            'contact' => $validated['parent_mobile'] ?? $enquiry->parent_mobile,
+            'date_of_birth' => $validated['dob'] ?? $enquiry->dob,
+            'class' => $validated['class'] ?? $enquiry->class,
+            'total_fee' => $validated['final_fees'] ?? $enquiry->final_fees,
+            'total_fees' => $validated['total_fees'] ?? $enquiry->total_fees,
+            'discount_fees' => $validated['discount_fees'] ?? $enquiry->discount_fees,
+            'final_fees' => $validated['final_fees'] ?? $enquiry->final_fees,
+        ]);
+        
+        // Sync with User model if it exists
+        $user = \App\Models\User::where('email', $enquiry->getOriginal('email'))
+            ->orWhere('email', $enquiry->email)
+            ->first();
+            
+        if ($user) {
+            $user->update([
+                'name' => $studentName,
+                'email' => $validated['email'] ?? $enquiry->email,
+                'phone' => $validated['parent_mobile'] ?? $enquiry->parent_mobile
+            ]);
+        }
+    }
 
     return redirect()->route('enquiry.enquiries.show', $id)->with('success', 'Enquiry updated successfully');
 }

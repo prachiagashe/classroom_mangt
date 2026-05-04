@@ -128,8 +128,8 @@
                     </p>
                 </div>
 
-                <a href="{{ Auth::user()->role === 'student' ? route('profile.index') : route('profile.index') }}"
-                   onclick="window.location='{{ Auth::user()->role === 'student' ? route('profile.index') : route('profile.index') }}'"
+                <a href="{{ Auth::user()->role === 'student' ? route('student.profile.index') : route('profile.index') }}"
+                   onclick="window.location='{{ Auth::user()->role === 'student' ? route('student.profile.index') : route('profile.index') }}'"
                    class="block px-4 py-2 hover:bg-gray-100 text-sm">
                     Profile Settings
                 </a>

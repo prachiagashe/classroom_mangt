@@ -116,7 +116,7 @@
                         <th>Paid Amount</th>
                         <th>Pending Amount</th>
                         <th class="text-center">Fee Status</th>
-                        <th class="text-right">Actions</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="feesTableBody">
@@ -187,7 +187,7 @@
                             </td>
 
                             <!-- Actions -->
-                            <td class="text-right">
+                            <td class="text-center">
                                 @if($enquiry)
                                     <a href="{{ route('enquiry.fees.show', $enquiry['admission_id']) }}" 
                                        class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all inline-flex items-center" title="View Details">

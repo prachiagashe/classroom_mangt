@@ -115,6 +115,13 @@
                 </div>
 
                 <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Date of Birth</label>
+                    <input type="date" name="date_of_birth"
+                           value="{{ old('date_of_birth', $admission->date_of_birth ? $admission->date_of_birth->format('Y-m-d') : '') }}"
+                           class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                </div>
+
+                <div class="space-y-2">
                     <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Roll Number</label>
                     <input type="text" name="roll_number"
                            value="{{ old('roll_number', $admission->roll_number) }}"

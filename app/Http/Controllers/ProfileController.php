@@ -88,7 +88,7 @@ class ProfileController extends Controller
     public function uploadAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:1024',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user = Auth::user();
@@ -125,7 +125,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'student_email' => 'required|email|exists:users,email',
-            'profile_photo' => 'required|image|mimes:jpeg,png,jpg|max:1024',
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $studentUser = \App\Models\User::where('email', $request->student_email)->first();

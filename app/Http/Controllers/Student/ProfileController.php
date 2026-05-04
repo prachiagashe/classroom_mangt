@@ -38,22 +38,69 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
             'email' => [
+                'sometimes',
                 'required',
                 'string',
                 'email',
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'phone' => 'required|string|max:20',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'phone' => 'sometimes|required|string|max:20',
+            'date_of_birth' => 'nullable|date',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         
-        // Update user information
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
+        // Update user information if provided
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $oldEmail = $user->email;
+            $newEmail = $request->email;
+            
+            if ($oldEmail !== $newEmail) {
+                $user->email = $newEmail;
+                // Sync email with admission record to maintain consistency
+                \App\Models\Admission::where('email', $oldEmail)->update(['email' => $newEmail]);
+            }
+        }
+
+        if ($request->has('phone')) {
+            $user->phone = $request->phone;
+        }
+
+        if ($request->has('date_of_birth')) {
+            // Sync DOB with admission record
+            \App\Models\Admission::where('email', $user->email)->update(['date_of_birth' => $request->date_of_birth]);
+            // Also sync with Enquiry record
+            $admission = \App\Models\Admission::where('email', $user->email)->first();
+            if ($admission && $admission->enquiry_id) {
+                \App\Models\Enquiry::where('id', $admission->enquiry_id)->update(['dob' => $request->date_of_birth]);
+            }
+        }
+        
+        // General sync for name/email
+        if ($request->has('name') || $request->has('email') || $request->has('phone')) {
+             \App\Models\Admission::where('email', $user->getOriginal('email') ?? $user->email)->update([
+                'student_name' => $user->name,
+                'email' => $user->email,
+                'contact' => $user->phone
+            ]);
+            
+            $admission = \App\Models\Admission::where('email', $user->email)->first();
+            if ($admission && $admission->enquiry_id) {
+                \App\Models\Enquiry::where('id', $admission->enquiry_id)->update([
+                    'first_name' => explode(' ', $user->name)[0] ?? '',
+                    'middle_name' => explode(' ', $user->name)[1] ?? '',
+                    'surname' => explode(' ', $user->name)[2] ?? '',
+                    'email' => $user->email,
+                    'parent_mobile' => $user->phone
+                ]);
+            }
+        }
         
         // Handle profile photo upload
         if ($request->hasFile('profile_photo')) {

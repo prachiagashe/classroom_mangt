@@ -271,7 +271,7 @@ class AdmissionController extends Controller
             'course' => 'nullable|array',
             'category' => 'nullable|string|max:50',
             'discount_fees' => 'nullable|numeric|min:0',
-            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'student_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'branch_code' => 'nullable|string|max:50',
             'admission_no' => 'nullable|string|max:50',
             'date' => 'nullable|date',
@@ -473,6 +473,7 @@ class AdmissionController extends Controller
             'contact'      => 'nullable|string',
             'email'        => 'nullable|email',
             'class'        => 'required|string',
+            'date_of_birth' => 'nullable|date',
             'roll_number'  => 'nullable|string',
             'total_fees'   => 'required|numeric|min:0',
             'discount_fees' => 'nullable|numeric|min:0',
@@ -524,6 +525,7 @@ class AdmissionController extends Controller
             'contact'       => $request->contact,
             'email'         => $request->email,
             'class'         => $request->class,
+            'date_of_birth' => $request->date_of_birth,
             'roll_number'   => $request->roll_number,
             'total_fees'    => $totalFees,
             'discount_fees' => $discountFees,
@@ -553,10 +555,28 @@ class AdmissionController extends Controller
                 // Update Enquiry table to ensure Fee / Show reflects these changes
                 if ($admission->enquiry) {
                     $admission->enquiry->update([
+                        'first_name' => explode(' ', $request->student_name)[0] ?? '',
+                        'middle_name' => explode(' ', $request->student_name)[1] ?? '',
+                        'surname' => explode(' ', $request->student_name)[2] ?? '',
+                        'email' => $request->email,
+                        'parent_mobile' => $request->contact,
+                        'dob' => $request->date_of_birth,
+                        'class' => $request->class,
                         'total_fees' => $totalFees,
                         'discount_fees' => $discountFees,
                         'final_fees' => $finalFees
                     ]);
+                }
+
+                // Sync with User model if it exists (for student account)
+                if ($request->email) {
+                    \App\Models\User::where('email', $admission->getOriginal('email'))
+                        ->orWhere('email', $request->email)
+                        ->update([
+                            'name' => $request->student_name,
+                            'email' => $request->email,
+                            'phone' => $request->contact
+                        ]);
                 }
 
                 $admission->update($updateData);

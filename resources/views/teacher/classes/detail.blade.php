@@ -84,7 +84,7 @@
                         <p class="text-sm font-semibold text-gray-600">No assignments published yet.</p>
                         <p class="text-xs text-gray-400 mt-1">Click "Add Assignment" to get started.</p>
                     </div>
-                @forelse
+                @endforelse
             </div>
         </div>
     </div>
