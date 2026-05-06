@@ -82,12 +82,13 @@
                            placeholder="Enter student name">
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Parent Name</label>
+                <!-- Parent Name -->
+                <div class="col-span-1">
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Parent / Father Name</label>
                     <input type="text" name="parent_name"
-                           value="{{ old('parent_name', $admission->parent_name ?? $admission->middle_name . ' ' . $admission->surname) }}"
-                           class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                           placeholder="Enter parent name">
+                           value="{{ old('parent_name', $admission->parent_name ?? ($admission->enquiry?->middle_name ?? '')) }}"
+                           class="w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
+                           placeholder="Enter parent's full name">
                 </div>
 
                 <div class="space-y-2">
@@ -127,6 +128,14 @@
                            value="{{ old('roll_number', $admission->roll_number) }}"
                            class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                            placeholder="Enter roll number">
+                </div>
+
+                <!-- Address -->
+                <div class="sm:col-span-2 space-y-2">
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Residential Address</label>
+                    <textarea name="address" rows="3"
+                              class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                              placeholder="Enter full residential address">{{ old('address', $admission->address ?? ($admission->enquiry?->address ?? '')) }}</textarea>
                 </div>
             </div>
         </div>

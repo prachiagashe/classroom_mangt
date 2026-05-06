@@ -44,11 +44,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-1">
                         <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Full Name</label>
-                        <p class="text-lg font-medium text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ $admission->student_name ?? ($admission->enquiry ? $admission->enquiry->first_name . ' ' . $admission->enquiry->surname : 'N/A') }}</p>
+                        <p class="text-lg font-medium text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{{ $admission->student_name ?? ($admission->enquiry ? trim(($admission->enquiry->first_name ?? '') . ' ' . ($admission->enquiry->middle_name ?? '') . ' ' . ($admission->enquiry->surname ?? '')) : 'N/A') }}</p>
                     </div>
                     <div class="space-y-1">
                         <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Class</label>
-                        <p class="text-lg font-medium text-gray-900 bg-blue-50 px-3 py-2 rounded-lg border-l-4 border-blue-500">{{ $admission->class ?? ($admission->enquiry?->class ?? 'N/A') }}</p>
+                        <p class="text-lg font-medium text-gray-900 bg-blue-50 px-3 py-2 rounded-lg border-l-4 border-blue-500">{{ $admission->formatted_class ?? ($admission->enquiry?->formatted_class ?? 'N/A') }}</p>
                     </div>
                     <div class="space-y-1">
                         <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Email</label>
@@ -70,9 +70,9 @@
                 <h3 class="font-semibold text-lg mb-4 text-gray-900">Parent Information</h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Father Name</label>
-                        <p class="text-gray-900 font-medium">{{ $admission->enquiry?->middle_name ?? ($admission->parent_name ?? 'N/A') }}</p>
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Parent / Father Name</label>
+                        <p class="text-gray-900 font-medium">{{ $admission->parent_name ?? ($admission->enquiry?->middle_name ?? 'N/A') }}</p>
                     </div>
                     <div>
                          <label class="text-sm font-medium text-gray-500">Address</label>

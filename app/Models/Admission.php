@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Enquiry;
 
+use App\Traits\FormatsClass;
+
 class Admission extends Model
 {
-    use HasFactory;
+    use HasFactory, FormatsClass;
 
     protected $table = 'admissions';
 

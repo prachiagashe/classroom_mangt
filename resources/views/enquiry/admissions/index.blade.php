@@ -206,7 +206,7 @@
                         </div>
                     </td>
                     <td>
-                        {{ $admission->class }}
+                        {{ $admission->formatted_class }}
                     </td>
                     <td>
                         <span class="secondary-text">{{ \Carbon\Carbon::parse($admission->admission_date)->format('d M Y') }}</span>

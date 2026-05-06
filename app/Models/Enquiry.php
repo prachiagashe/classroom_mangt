@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\FormatsClass;
+
 class Enquiry extends Model
 {
-    use HasFactory;
+    use HasFactory, FormatsClass;
 
     protected $table = 'enquiries';
 
@@ -100,26 +102,5 @@ class Enquiry extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function getFormattedClassAttribute()
-    {
-        $value = $this->class;
-        if (empty($value)) return '-';
 
-        if (is_numeric($value)) {
-            $number = (int) $value;
-            // Handle special cases: 11, 12, 13 are always 'th'
-            if ($number % 100 >= 11 && $number % 100 <= 13) {
-                return $number . 'th';
-            }
-            // Standard ordinal rules
-            switch ($number % 10) {
-                case 1:  return $number . 'st';
-                case 2:  return $number . 'nd';
-                case 3:  return $number . 'rd';
-                default: return $number . 'th';
-            }
-        }
-
-        return $value;
-    }
 }

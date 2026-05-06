@@ -99,7 +99,7 @@ class AdmissionController extends Controller
             ->paginate(10, ['*'], 'enquiries_page');
 
         // Predefined classes logic
-        $classes = ['5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
+        $classes = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
         
         // Get classes with student counts for the view (we'll just use the old grouping, it's commented out in view anyway)
         $classesWithCounts = Admission::select('class', DB::raw('count(*) as student_count'))
@@ -463,6 +463,7 @@ class AdmissionController extends Controller
      */
     public function update(Request $request, $id)
     {
+        \Log::info('Admission update requested for ID: ' . $id, ['request' => $request->all()]);
         $admission = Admission::findOrFail($id);
         $hasPayments = \App\Models\FeePayment::where('admission_id', $id)->count() > 0;
 
@@ -475,6 +476,7 @@ class AdmissionController extends Controller
             'class'        => 'required|string',
             'date_of_birth' => 'nullable|date',
             'roll_number'  => 'nullable|string',
+            'address'      => 'nullable|string|max:1000',
             'total_fees'   => 'required|numeric|min:0',
             'discount_fees' => 'nullable|numeric|min:0',
             'final_fees'   => 'required|numeric|min:0',
@@ -527,6 +529,7 @@ class AdmissionController extends Controller
             'class'         => $request->class,
             'date_of_birth' => $request->date_of_birth,
             'roll_number'   => $request->roll_number,
+            'address'       => $request->address,
             'total_fees'    => $totalFees,
             'discount_fees' => $discountFees,
             'final_fees'    => $finalFees,
@@ -554,14 +557,20 @@ class AdmissionController extends Controller
             DB::transaction(function () use ($admission, $updateData, $request, $finalFees, $hasPayments, $totalFees, $discountFees) {
                 // Update Enquiry table to ensure Fee / Show reflects these changes
                 if ($admission->enquiry) {
+                    $nameParts = explode(' ', trim($request->student_name));
+                    $firstName = $nameParts[0] ?? '';
+                    $surname = count($nameParts) > 1 ? end($nameParts) : '';
+                    $middleName = count($nameParts) > 2 ? implode(' ', array_slice($nameParts, 1, -1)) : ($request->parent_name ?: '');
+
                     $admission->enquiry->update([
-                        'first_name' => explode(' ', $request->student_name)[0] ?? '',
-                        'middle_name' => explode(' ', $request->student_name)[1] ?? '',
-                        'surname' => explode(' ', $request->student_name)[2] ?? '',
+                        'first_name' => $firstName,
+                        'middle_name' => $middleName,
+                        'surname' => $surname,
                         'email' => $request->email,
                         'parent_mobile' => $request->contact,
                         'dob' => $request->date_of_birth,
                         'class' => $request->class,
+                        'address' => $request->address,
                         'total_fees' => $totalFees,
                         'discount_fees' => $discountFees,
                         'final_fees' => $finalFees

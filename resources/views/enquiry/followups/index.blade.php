@@ -154,7 +154,7 @@
                                 </p>
 
                                 <p>Contact: {{ $followUp->enquiry->parent_mobile ?? '-' }}</p>
-                                <p>Class: {{ $followUp->enquiry->class ?? '-' }}</p>
+                                <p>Class: {{ $followUp->enquiry->formatted_class ?? '-' }}</p>
 
                                 <p>
                                     {{ \Carbon\Carbon::parse($followUp->followup_time)->format('h:i A') }}

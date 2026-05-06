@@ -113,7 +113,7 @@ class FeesController extends Controller
                 'student_name' => $admission->student_name,
                 'payment_mode' => $paymentModeDisplay,
                 'contact' => $admission->contact,
-                'class' => $admission->class,
+                'class' => $admission->formatted_class,
                 'total_fee' => $totalFee,
                 'discount' => $enquiry->discount_fees ?? 0,
                 'paid_amount' => $paidAmount,
