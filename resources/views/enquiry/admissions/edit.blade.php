@@ -75,36 +75,36 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Student Name</label>
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Student Name <span class="text-red-500">*</span></label>
                     <input type="text" name="student_name"
                            value="{{ old('student_name', $admission->student_name ?? $admission->first_name . ' ' . $admission->middle_name . ' ' . $admission->surname) }}"
                            class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                           placeholder="Enter student name">
+                           placeholder="Enter student name" required>
                 </div>
 
                 <!-- Parent Name -->
                 <div class="col-span-1">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Parent / Father Name</label>
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Parent / Father Name <span class="text-red-500">*</span></label>
                     <input type="text" name="parent_name"
                            value="{{ old('parent_name', $admission->parent_name ?? ($admission->enquiry?->middle_name ?? '')) }}"
                            class="w-full mt-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
-                           placeholder="Enter parent's full name">
+                           placeholder="Enter parent's full name" required>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Class</label>
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Class <span class="text-red-500">*</span></label>
                     <input type="text" name="class"
                            value="{{ old('class', $admission->class) }}"
                            class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                           placeholder="Enter class">
+                           placeholder="Enter class" required>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Contact</label>
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Contact <span class="text-red-500">*</span></label>
                     <input type="text" name="contact"
                            value="{{ old('contact', $admission->contact ?? $admission->mobile) }}"
                            class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                           placeholder="Enter contact number">
+                           placeholder="Enter contact number" required>
                 </div>
 
                 <div class="space-y-2">
@@ -123,11 +123,11 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Roll Number</label>
+                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Roll Number <span class="text-red-500">*</span></label>
                     <input type="text" name="roll_number"
                            value="{{ old('roll_number', $admission->roll_number) }}"
                            class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                           placeholder="Enter roll number">
+                           placeholder="Enter roll number" required>
                 </div>
 
                 <!-- Address -->

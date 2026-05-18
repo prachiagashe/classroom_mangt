@@ -470,12 +470,12 @@ class AdmissionController extends Controller
         // Dynamic validation
         $validationRules = [
             'student_name' => 'required|string',
-            'parent_name'  => 'nullable|string',
-            'contact'      => 'nullable|string',
+            'parent_name'  => 'required|string',
+            'contact'      => 'required|string',
             'email'        => 'nullable|email',
             'class'        => 'required|string',
             'date_of_birth' => 'nullable|date',
-            'roll_number'  => 'nullable|string',
+            'roll_number'  => 'required|string',
             'address'      => 'nullable|string|max:1000',
             'total_fees'   => 'required|numeric|min:0',
             'discount_fees' => 'nullable|numeric|min:0',
@@ -620,9 +620,9 @@ class AdmissionController extends Controller
                     \App\Models\FeePayment::create([
                         'admission_id' => $admission->id,
                         'amount' => $payNowAmount,
-                        'payment_mode' => $request->payment_mode === 'installment' ? 'cash' : $request->payment_mode,
+                        'payment_mode' => $request->first_payment_mode ?? ($request->payment_mode === 'installment' ? 'cash' : $request->payment_mode),
                         'payment_date' => now()->toDateString(),
-                        'transaction_id' => $request->payment_mode === 'online' ? 'TXN-' . strtoupper(uniqid()) : null,
+                        'transaction_id' => $request->payment_mode === 'online' || $request->first_payment_mode === 'online' ? 'TXN-' . strtoupper(uniqid()) : null,
                         'remarks' => $paymentRemarks
                     ]);
 
@@ -639,7 +639,7 @@ class AdmissionController extends Controller
             });
 
             return redirect()
-                ->route('enquiry.admissions.index')
+                ->route('enquiry.admissions.show', $admission->id)
                 ->with('success', 'Admission updated successfully!');
 
         } catch (\Exception $e) {

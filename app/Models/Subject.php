@@ -13,6 +13,8 @@ class Subject extends Model
         'name',
         'code',
         'class_name',
+        'course_name',
+        'program_type',
         'course_type',
         'description',
         'teacher_name',

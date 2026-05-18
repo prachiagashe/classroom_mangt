@@ -56,40 +56,46 @@
                             {{ $subjects->count() }}
                         </span>
                     </button>
-                    <button onclick="filterSubjects('REGULAR')" 
+                    <button onclick="filterSubjects('Regular')" 
                             class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-                            data-filter="REGULAR">
+                            data-filter="Regular">
                         Regular
                         <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
-                            {{ $subjects->where('course_type', 'REGULAR')->count() }}
+                            {{ $subjects->where('program_type', 'Regular')->count() }}
                         </span>
                     </button>
-                    @if(in_array($className, ['11', '12']))
-                        <button onclick="filterSubjects('NEET')" 
-                                class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                data-filter="NEET">
-                            NEET
-                            <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
-                                {{ $subjects->where('course_type', 'NEET')->count() }}
-                            </span>
-                        </button>
-                        <button onclick="filterSubjects('JEE')" 
-                                class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                data-filter="JEE">
-                            JEE
-                            <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
-                                {{ $subjects->where('course_type', 'JEE')->count() }}
-                            </span>
-                        </button>
-                        <button onclick="filterSubjects('MHT-CET')" 
-                                class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                data-filter="MHT-CET">
-                            MHT-CET
-                            <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
-                                {{ $subjects->where('course_type', 'MHT-CET')->count() }}
-                            </span>
-                        </button>
-                    @endif
+                    <button onclick="filterSubjects('NEET')" 
+                            class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            data-filter="NEET">
+                        NEET
+                        <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
+                            {{ $subjects->where('course_name', 'NEET')->count() }}
+                        </span>
+                    </button>
+                    <button onclick="filterSubjects('JEE')" 
+                            class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            data-filter="JEE">
+                        JEE
+                        <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
+                            {{ $subjects->where('course_name', 'JEE')->count() }}
+                        </span>
+                    </button>
+                    <button onclick="filterSubjects('Repeater')" 
+                            class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            data-filter="Repeater">
+                        Repeater
+                        <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
+                            {{ $subjects->where('program_type', 'Repeater')->count() }}
+                        </span>
+                    </button>
+                    <button onclick="filterSubjects('Crash Course')" 
+                            class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            data-filter="Crash Course">
+                        Crash Course
+                        <span class="ml-1 bg-gray-500 bg-opacity-20 px-2 py-0.5 rounded-full text-xs">
+                            {{ $subjects->where('program_type', 'Crash Course')->count() }}
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -170,7 +176,8 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($subjects as $subject)
                                     <tr class="hover:bg-gray-50 transition-colors subject-row" 
-                                        data-course-type="{{ $subject->course_type }}">
+                                        data-course-name="{{ $subject->course_name }}"
+                                        data-program-type="{{ $subject->program_type }}">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">{{ $subject->name }}</div>
                                             @if($subject->description)
@@ -181,12 +188,19 @@
                                             <div class="text-sm text-gray-900">{{ $subject->code }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                {{ $subject->course_type == 'NEET' ? 'bg-purple-100 text-purple-800' : 
-                                                   ($subject->course_type == 'JEE' ? 'bg-indigo-100 text-indigo-800' : 
-                                                   ($subject->course_type == 'MHT-CET' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')) }}">
-                                                {{ $subject->course_type }}
-                                            </span>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                                                    {{ $subject->course_name == 'NEET' ? 'bg-red-100 text-red-700' : 
+                                                       ($subject->course_name == 'JEE' ? 'bg-blue-100 text-blue-700' : 
+                                                       ($subject->course_name == 'MHT-CET' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700')) }}">
+                                                    {{ $subject->course_name ?: 'REGULAR' }}
+                                                </span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium
+                                                    {{ $subject->program_type == 'Repeater' ? 'bg-orange-100 text-orange-800' : 
+                                                       ($subject->program_type == 'Crash Course' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800') }}">
+                                                    {{ $subject->program_type ?: 'Regular' }}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">{{ $subject->teacher_name }}</div>
@@ -377,30 +391,30 @@
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label for="course_type" class="block text-sm font-medium text-gray-700 mb-2">
-                        Course Type <span class="text-red-500">*</span>
-                    </label>
-                    @if(in_array($className, ['11', '12']))
-                        <select id="course_type" name="course_type" required
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="course_name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Course <span class="text-red-500">*</span>
+                        </label>
+                        <select id="course_name" name="course_name" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Select Course Type</option>
                             <option value="REGULAR">Regular</option>
                             <option value="NEET">NEET</option>
                             <option value="JEE">JEE</option>
                             <option value="MHT-CET">MHT-CET</option>
-                            <option value="NEET Repeater">NEET Repeater</option>
-                            <option value="JEE Repeater">JEE Repeater</option>
                         </select>
-                    @else
-                        <input type="hidden" name="course_type" value="REGULAR" id="course_type">
-                        <div class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700">
-                            REGULAR (Auto-set for Classes 5-10)
-                        </div>
-                    @endif
-                    @error('course_type')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    </div>
+                    <div>
+                        <label for="program_type" class="block text-sm font-medium text-gray-700 mb-2">
+                            Program <span class="text-red-500">*</span>
+                        </label>
+                        <select id="program_type" name="program_type" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="Regular">Regular</option>
+                            <option value="Repeater">Repeater</option>
+                            <option value="Crash Course">Crash Course</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -1014,7 +1028,8 @@ function closeAddSubjectModal() {
     // Clear form fields
     document.getElementById('subject_name').value = '';
     document.getElementById('subject_code').value = '';
-    document.getElementById('course_type').value = '';
+    document.getElementById('course_name').value = 'REGULAR';
+    document.getElementById('program_type').value = 'Regular';
     document.getElementById('teacher_name').value = '';
     document.getElementById('teacher_email').value = '';
     document.getElementById('description').value = '';
@@ -1162,14 +1177,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 });
 
-// Filter subjects by course type
-function filterSubjects(courseType) {
+// Filter subjects by course name or program type
+function filterSubjects(filter) {
     const subjectRows = document.querySelectorAll('.subject-row');
     const filterButtons = document.querySelectorAll('.filter-btn');
     
     // Update button styles
     filterButtons.forEach(btn => {
-        if (btn.dataset.filter === courseType) {
+        if (btn.dataset.filter === filter) {
             btn.className = 'filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-blue-600 text-white';
         } else {
             btn.className = 'filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300';
@@ -1178,10 +1193,13 @@ function filterSubjects(courseType) {
     
     // Filter subjects
     subjectRows.forEach(row => {
-        if (courseType === 'all') {
+        if (filter === 'all') {
             row.style.display = '';
         } else {
-            if (row.dataset.courseType === courseType) {
+            const courseName = row.dataset.courseName;
+            const programType = row.dataset.programType;
+            
+            if (courseName === filter || programType === filter) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';

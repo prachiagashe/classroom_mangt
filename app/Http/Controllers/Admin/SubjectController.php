@@ -15,58 +15,84 @@ class SubjectController extends Controller
      */
     public function classes()
     {
-        // Get classes from 5th to 12th with subject counts
+        // Get regular classes with subject counts
         $classes = [];
         for ($i = 5; $i <= 12; $i++) {
-            $subjectCount = Subject::where('class_name', $i)->count();
+            $subjectCount = Subject::where('class_name', (string)$i)
+                ->where(function($q) {
+                    $q->where('program_type', 'Regular')->orWhereNull('program_type');
+                })
+                ->count();
             
             $classes[] = [
-                'name' => $i,
+                'name' => (string)$i,
                 'subject_count' => $subjectCount
             ];
         }
         
-        // Add repeater programs
-        $neetCount = Subject::where('course_type', 'NEET Repeater')->count();
-        $jeeCount = Subject::where('course_type', 'JEE Repeater')->count();
-        
-        $classes[] = [
-            'name' => 'NEET Repeater',
-            'subject_count' => $neetCount ?: 8, // Default count if no subjects yet
-            'is_repeater' => true
+        // Get specialized/competitive programs
+        $competitivePrograms = [
+            ['course' => 'NEET', 'type' => 'Repeater'],
+            ['course' => 'JEE', 'type' => 'Repeater'],
+            ['course' => 'MHT-CET', 'type' => 'Repeater'],
+            ['course' => 'NEET', 'type' => 'Crash Course'],
+            ['course' => 'JEE', 'type' => 'Crash Course'],
         ];
+
+        $specialPrograms = [];
+        foreach ($competitivePrograms as $prog) {
+            $subjectCount = Subject::where('course_name', $prog['course'])
+                ->where('program_type', $prog['type'])
+                ->count();
+            
+            if ($subjectCount > 0 || in_array($prog['type'], ['Repeater'])) {
+                $specialPrograms[] = [
+                    'name' => $prog['course'] . ' ' . $prog['type'],
+                    'course_name' => $prog['course'],
+                    'program_type' => $prog['type'],
+                    'subject_count' => $subjectCount,
+                    'is_special' => true
+                ];
+            }
+        }
         
-        $classes[] = [
-            'name' => 'JEE Repeater',
-            'subject_count' => $jeeCount ?: 10, // Default count if no subjects yet
-            'is_repeater' => true
-        ];
-        
-        return view('admin.subjects.classes', compact('classes'));
+        return view('admin.subjects.classes', compact('classes', 'specialPrograms'));
     }
     
     /**
-     * Display subjects for a specific class.
+     * Display subjects for a specific class or program.
      */
     public function class($className)
     {
-        // Handle repeater programs
-        if ($className === 'NEET Repeater') {
-            $subjects = Subject::where('course_type', 'NEET Repeater')
-                ->where('is_active', true)
-                ->get();
-        } elseif ($className === 'JEE Repeater') {
-            $subjects = Subject::where('course_type', 'JEE Repeater')
+        // Parse className to see if it's a special program (e.g. "NEET Repeater")
+        $specialTypes = ['Repeater', 'Crash Course'];
+        $isSpecial = false;
+        $courseName = null;
+        $programType = 'Regular';
+
+        foreach ($specialTypes as $type) {
+            if (str_contains($className, $type)) {
+                $isSpecial = true;
+                $courseName = trim(str_replace($type, '', $className));
+                $programType = $type;
+                break;
+            }
+        }
+
+        if ($isSpecial) {
+            $subjects = Subject::where('course_name', $courseName)
+                ->where('program_type', $programType)
                 ->where('is_active', true)
                 ->get();
         } else {
             // Regular classes
             $subjects = Subject::where('class_name', $className)
+                ->where('program_type', 'Regular')
                 ->where('is_active', true)
                 ->get();
         }
             
-        $studentRequests = collect(); // You can add logic for student requests if needed
+        $studentRequests = collect();
         
         return view('admin.subjects.class-subjects', compact('className', 'subjects', 'studentRequests'));
     }
@@ -80,7 +106,8 @@ class SubjectController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:subjects,code',
             'class_name' => 'required|string',
-            'course_type' => 'required|string|in:REGULAR,NEET,JEE,MHT-CET,NEET Repeater,JEE Repeater',
+            'course_name' => 'required|string',
+            'program_type' => 'required|string',
             'teacher_name' => 'required|string',
             'teacher_email' => 'nullable|email',
             'description' => 'nullable|string',
@@ -89,12 +116,14 @@ class SubjectController extends Controller
 
         $subjectData = $request->all();
         
-        // Set default values
+        // Set course_type for backward compatibility if needed
+        $subjectData['course_type'] = $request->course_name . ($request->program_type !== 'Regular' ? ' ' . $request->program_type : '');
+        
         if (!isset($subjectData['is_active'])) {
             $subjectData['is_active'] = true;
         }
         if (!isset($subjectData['credits'])) {
-            $subjectData['credits'] = 4; // Default credits
+            $subjectData['credits'] = 4;
         }
 
         $subject = Subject::create($subjectData);
@@ -122,7 +151,8 @@ class SubjectController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:subjects,code,' . $id,
-            'course_type' => 'nullable|string|in:REGULAR,NEET,JEE,MHT-CET,NEET Repeater,JEE Repeater',
+            'course_name' => 'required|string',
+            'program_type' => 'required|string',
             'teacher_name' => 'required|string',
             'teacher_email' => 'nullable|email',
             'description' => 'nullable|string',
@@ -130,8 +160,8 @@ class SubjectController extends Controller
         ]);
 
         $subjectData = $request->all();
+        $subjectData['course_type'] = $request->course_name . ($request->program_type !== 'Regular' ? ' ' . $request->program_type : '');
         
-        // Set default value for is_active if not provided
         if (!isset($subjectData['is_active'])) {
             $subjectData['is_active'] = true;
         }

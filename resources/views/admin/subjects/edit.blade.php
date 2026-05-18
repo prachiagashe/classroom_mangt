@@ -56,30 +56,30 @@
                         @enderror
                     </div>
 
-                    <div>
-                        <label for="course_type" class="block text-sm font-medium text-gray-700 mb-2">
-                            Course Type
-                        </label>
-                        @if(in_array($subject->class_name, ['5', '6', '7', '8', '9', '10']))
-                            <input type="hidden" name="course_type" value="REGULAR">
-                            <div class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700">
-                                REGULAR (Auto-set for Classes 5-10)
-                            </div>
-                        @else
-                            <select id="course_type" name="course_type"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Select Course Type (Optional)</option>
-                            <option value="REGULAR" {{ $subject->course_type == 'REGULAR' ? 'selected' : '' }}>REGULAR</option>
-                            <option value="NEET" {{ $subject->course_type == 'NEET' ? 'selected' : '' }}>NEET</option>
-                            <option value="JEE" {{ $subject->course_type == 'JEE' ? 'selected' : '' }}>JEE</option>
-                            <option value="MHT-CET" {{ $subject->course_type == 'MHT-CET' ? 'selected' : '' }}>MHT-CET</option>
-                            <option value="NEET Repeater" {{ $subject->course_type == 'NEET Repeater' ? 'selected' : '' }}>NEET Repeater</option>
-                            <option value="JEE Repeater" {{ $subject->course_type == 'JEE Repeater' ? 'selected' : '' }}>JEE Repeater</option>
-                        </select>
-                        @endif
-                        @error('course_type')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="course_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Course <span class="text-red-500">*</span>
+                            </label>
+                            <select id="course_name" name="course_name" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="REGULAR" {{ $subject->course_name == 'REGULAR' ? 'selected' : '' }}>Regular</option>
+                                <option value="NEET" {{ $subject->course_name == 'NEET' ? 'selected' : '' }}>NEET</option>
+                                <option value="JEE" {{ $subject->course_name == 'JEE' ? 'selected' : '' }}>JEE</option>
+                                <option value="MHT-CET" {{ $subject->course_name == 'MHT-CET' ? 'selected' : '' }}>MHT-CET</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="program_type" class="block text-sm font-medium text-gray-700 mb-2">
+                                Program <span class="text-red-500">*</span>
+                            </label>
+                            <select id="program_type" name="program_type" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="Regular" {{ $subject->program_type == 'Regular' ? 'selected' : '' }}>Regular</option>
+                                <option value="Repeater" {{ $subject->program_type == 'Repeater' ? 'selected' : '' }}>Repeater</option>
+                                <option value="Crash Course" {{ $subject->program_type == 'Crash Course' ? 'selected' : '' }}>Crash Course</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
