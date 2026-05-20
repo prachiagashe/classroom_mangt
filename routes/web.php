@@ -54,6 +54,10 @@ Route::middleware('auth')
             ->name('dashboard');
         Route::get('/api/sessions', [DashboardController::class, 'getSessionsData'])
             ->name('api.sessions');
+        Route::get('/api/fees-paid', [DashboardController::class, 'getConfirmedFeePaidStudents'])
+            ->name('api.fees-paid');
+        Route::get('/api/fees-pending', [DashboardController::class, 'getConfirmedPendingFeeStudents'])
+            ->name('api.fees-pending');
 
 
         // ================= ENQUIRIES =================

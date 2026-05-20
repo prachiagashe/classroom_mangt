@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Admission;
 use App\Models\FollowUp;
 use App\Models\Employee\Employee;
-
-
+use App\Models\FeePayment;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -72,6 +72,21 @@ class DashboardController extends Controller
         $employeesData = Employee::latest()->take(5)->get();
         $totalEmployeesCount = Employee::count();
 
+        // 6. Dynamic Fee Calculations
+        $confirmedEnquiries = Enquiry::with('admission')->whereIn('status', ['confirmed', 'CONFIRMED'])->get();
+        
+        $feeCollectionThisMonth = $confirmedEnquiries->sum(function($enquiry) {
+            return $enquiry->admission ? ($enquiry->admission->paid_amount ?? 0) : 0;
+        });
+            
+        $pendingFees = $confirmedEnquiries->sum(function($enquiry) {
+            if ($enquiry->admission) {
+                $total = $enquiry->admission->final_fees ?? $enquiry->admission->total_fee ?? $enquiry->final_fees ?? 0;
+                return max(0, $total - ($enquiry->admission->paid_amount ?? 0));
+            }
+            return 0;
+        });
+
         return view(
             'enquiry.dashboard',
             compact(
@@ -84,9 +99,79 @@ class DashboardController extends Controller
                 'studentsData',
                 'totalStudentsCount',
                 'employeesData',
-                'totalEmployeesCount'
+                'totalEmployeesCount',
+                'feeCollectionThisMonth',
+                'pendingFees'
             )
         );
+    }
+    
+    /**
+     * AJAX endpoint for Confirmed students who paid fees.
+     */
+    public function getConfirmedFeePaidStudents(Request $request)
+    {
+        try {
+            $enquiries = Enquiry::with('admission')
+                ->whereIn('status', ['confirmed', 'CONFIRMED'])
+                ->get();
+                
+            $students = $enquiries->filter(function($enquiry) {
+                return $enquiry->admission && $enquiry->admission->paid_amount > 0;
+            })->map(function($enquiry) {
+                $name = trim(($enquiry->first_name ?? '') . ' ' . ($enquiry->surname ?? ''));
+                $paid = $enquiry->admission->paid_amount ?? 0;
+                $total = $enquiry->admission->final_fees ?? $enquiry->admission->total_fee ?? $enquiry->final_fees ?? 0;
+                
+                return [
+                    'name' => $name ?: 'Unknown',
+                    'class' => $enquiry->class ?? 'N/A',
+                    'paid_amount' => $paid,
+                    'pending_amount' => max(0, $total - $paid),
+                    'status' => 'Paid'
+                ];
+            })->values();
+            
+            return response()->json($students);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching paid students: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
+    /**
+     * AJAX endpoint for Confirmed students with pending fees.
+     */
+    public function getConfirmedPendingFeeStudents(Request $request)
+    {
+        try {
+            $enquiries = Enquiry::with('admission')
+                ->whereIn('status', ['confirmed', 'CONFIRMED'])
+                ->get();
+                
+            $students = $enquiries->filter(function($enquiry) {
+                $total = $enquiry->admission->final_fees ?? $enquiry->admission->total_fee ?? $enquiry->final_fees ?? 0;
+                $paid = $enquiry->admission->paid_amount ?? 0;
+                return $enquiry->admission && ($total - $paid) > 0;
+            })->map(function($enquiry) {
+                $name = trim(($enquiry->first_name ?? '') . ' ' . ($enquiry->surname ?? ''));
+                $total = $enquiry->admission->final_fees ?? $enquiry->admission->total_fee ?? $enquiry->final_fees ?? 0;
+                $paid = $enquiry->admission->paid_amount ?? 0;
+                
+                return [
+                    'name' => $name ?: 'Unknown',
+                    'class' => $enquiry->class ?? 'N/A',
+                    'paid_amount' => $paid,
+                    'pending_amount' => max(0, $total - $paid),
+                    'status' => 'Pending'
+                ];
+            })->values();
+            
+            return response()->json($students);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching pending students: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 public function reports(Request $request)

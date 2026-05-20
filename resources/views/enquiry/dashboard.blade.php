@@ -186,12 +186,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
     <!-- Fee Collection -->
-    <div class="group relative p-6 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-teal-200">
+    <div onclick="fetchDynamicTableData('fees-paid')" class="cursor-pointer group relative p-6 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-teal-200">
         <div class="absolute inset-0 bg-white/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div class="relative flex justify-between">
             <div>
                 <p class="text-teal-600 text-sm font-medium mb-1">Fee Collection (This Month)</p>
-                <h2 class="text-3xl font-bold mt-1 text-teal-900">₹4.2L</h2>
+                <h2 class="text-3xl font-bold mt-1 text-teal-900">₹{{ number_format($feeCollectionThisMonth) }}</h2>
                 <div class="flex items-center gap-1 mt-2">
                     <div class="w-2 h-2 bg-teal-500 rounded-full"></div>
                     <p class="text-teal-500 text-sm font-medium">On track</p>
@@ -210,12 +210,12 @@
     </div>
 
     <!-- Pending Fees -->
-    <div class="group relative p-6 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-red-200">
+    <div onclick="fetchDynamicTableData('fees-pending')" class="cursor-pointer group relative p-6 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-red-200">
         <div class="absolute inset-0 bg-white/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div class="relative flex justify-between">
             <div>
                 <p class="text-red-600 text-sm font-medium mb-1">Pending Fees</p>
-                <h2 class="text-3xl font-bold mt-1 text-red-900">₹1.8L</h2>
+                <h2 class="text-3xl font-bold mt-1 text-red-900">₹{{ number_format($pendingFees) }}</h2>
                 <div class="flex items-center gap-1 mt-2">
                     <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                     <p class="text-red-500 text-sm font-medium">Action needed</p>
@@ -307,7 +307,7 @@
 
             <div class="overflow-x-auto">
                 <table class="crm-table">
-                    <thead>
+                    <thead id="recentEnquiriesTableHeader">
                         <tr>
                             <th>Student Name</th>
                             <th>Parent</th>
@@ -1447,6 +1447,78 @@ function cancelPTMSchedule(id) {
         console.error(err);
         showNotification('Network error.', 'error');
     });
+}
+
+function fetchDynamicTableData(type) {
+    // Show loading state
+    const tbody = document.getElementById('recentEnquiriesTableBody');
+    const thead = document.getElementById('recentEnquiriesTableHeader');
+    
+    if (!tbody || !thead) return;
+    
+    // Switch to Recent Enquiries section if not visible
+    const recentSection = document.getElementById('recentEnquiriesSection');
+    const activeSectionCard = document.getElementById('card-recentEnquiriesSection');
+    if(recentSection.classList.contains('hidden')) {
+        toggleSection('recentEnquiriesSection', activeSectionCard);
+    }
+    
+    // Update headers based on type
+    if (type === 'fees-paid' || type === 'fees-pending') {
+        document.querySelector('#recentEnquiriesSection h3').innerHTML = `<span class="text-2xl">💰</span> ${type === 'fees-paid' ? 'Paid Fees (Confirmed)' : 'Pending Fees (Confirmed)'}`;
+        
+        thead.innerHTML = `
+            <tr>
+                <th>Student Name</th>
+                <th>Class</th>
+                <th>Paid Amount</th>
+                <th>Pending Amount</th>
+                <th>Payment Status</th>
+            </tr>
+        `;
+    }
+    
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12"><div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full" role="status" aria-label="loading"></div></td></tr>`;
+    
+    const endpoint = type === 'fees-paid' ? '/enquiry/api/fees-paid' : '/enquiry/api/fees-pending';
+    
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-500">No students found</td></tr>`;
+                return;
+            }
+            
+            let html = '';
+            data.forEach(student => {
+                const statusBadge = student.status === 'Paid' 
+                    ? '<span class="crm-badge crm-badge-success">Paid</span>'
+                    : '<span class="crm-badge crm-badge-warning" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a;">Pending</span>';
+                    
+                html += `
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="crm-avatar bg-gradient-to-br from-blue-500 to-indigo-600">
+                                    ${student.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <span class="font-bold text-gray-900">${student.name}</span>
+                            </div>
+                        </td>
+                        <td><span class="crm-badge crm-badge-info">${student.class}</span></td>
+                        <td class="font-bold text-green-600">₹${parseFloat(student.paid_amount).toLocaleString('en-IN')}</td>
+                        <td class="font-bold text-red-600">₹${parseFloat(student.pending_amount).toLocaleString('en-IN')}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        })
+        .catch(err => {
+            console.error(err);
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500">Error loading data</td></tr>`;
+        });
 }
 </script>
 </div>
