@@ -104,31 +104,31 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="crm-table">
+            <table class="crm-table w-full text-sm">
                 <thead>
                     <tr>
-                        <th>Student Name</th>
-                        <th>Payment Mode</th>
-                        <th>Contact</th>
-                        <th>Class</th>
-                        <th>Total Fee</th>
-                        <th>Discount</th>
-                        <th>Paid Amount</th>
-                        <th>Pending Amount</th>
-                        <th class="text-center">Fee Status</th>
-                        <th class="text-center">Actions</th>
+                        <th class="whitespace-nowrap">Student Name</th>
+                        <th class="whitespace-nowrap">Mode</th>
+                        <th class="whitespace-nowrap">Contact</th>
+                        <th class="whitespace-nowrap">Class</th>
+                        <th class="whitespace-nowrap">Total</th>
+                        <th class="whitespace-nowrap">Discount</th>
+                        <th class="whitespace-nowrap">Paid</th>
+                        <th class="whitespace-nowrap">Pending</th>
+                        <th class="text-center whitespace-nowrap">Status</th>
+                        <th class="text-center whitespace-nowrap">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="feesTableBody">
                     @forelse($enquiries as $enquiry)
                         <tr>
                             <!-- Student Name -->
-                            <td>
+                            <td class="py-3 align-middle">
                                 <div class="flex items-center gap-3">
-                                    <div class="crm-avatar bg-gradient-to-br from-blue-500 to-indigo-600">
+                                    <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full text-sm font-semibold text-white bg-gradient-to-br from-blue-500 to-indigo-600">
                                         {{ $enquiry ? substr($enquiry['student_name'] ?? 'N/A', 0, 1) : 'N' }}
                                     </div>
-                                    <span class="font-bold text-gray-900">{{ $enquiry ? ($enquiry['student_name'] ?? 'N/A') : 'N/A' }}</span>
+                                    <span class="text-sm font-semibold leading-5 text-gray-900 truncate max-w-[130px] block" title="{{ $enquiry ? ($enquiry['student_name'] ?? 'N/A') : 'N/A' }}">{{ $enquiry ? ($enquiry['student_name'] ?? 'N/A') : 'N/A' }}</span>
                                 </div>
                             </td>
 

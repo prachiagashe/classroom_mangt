@@ -32,7 +32,7 @@
 
         <!-- Payment Form -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <form method="POST" action="{{ route('salary.update', $salaryRecord->id) }}">
+            <form method="POST" action="{{ route('salary.update', $salaryRecord->id) }}" id="paymentForm">
                 @csrf
                 @method('PUT')
                 
@@ -220,5 +220,84 @@ function updatePaymentStatus() {
 document.addEventListener('DOMContentLoaded', function() {
     calculateNetSalary();
 });
+
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const btn = form.querySelector('button[type="submit"]');
+    const originalText = btn.innerText;
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Updating...';
+    
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    })
+    .then(async response => {
+        if(response.ok) {
+            Swal.fire({
+                title: 'Payment Updated Successfully',
+                text: 'Salary payment details have been updated successfully.',
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                showCloseButton: true,
+                showConfirmButton: true,
+                confirmButtonColor: '#16a34a',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl',
+                    confirmButton: 'px-6 py-2.5 rounded-lg font-medium'
+                }
+            }).then(() => {
+                window.location.href = response.url;
+            });
+        } else {
+            Swal.fire({
+                title: 'Payment Update Failed',
+                text: 'Something went wrong. Please try again.',
+                icon: 'error',
+                timer: 5000,
+                timerProgressBar: true,
+                showCloseButton: true,
+                showConfirmButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Try Again',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl',
+                    confirmButton: 'px-6 py-2.5 rounded-lg font-medium'
+                }
+            });
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            title: 'Payment Update Failed',
+            text: 'Something went wrong. Please try again.',
+            icon: 'error',
+            timer: 5000,
+            timerProgressBar: true,
+            showCloseButton: true,
+            showConfirmButton: true,
+            confirmButtonColor: '#dc2626',
+            confirmButtonText: 'Try Again',
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                confirmButton: 'px-6 py-2.5 rounded-lg font-medium'
+            }
+        });
+        btn.disabled = false;
+        btn.innerText = originalText;
+    });
+});
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

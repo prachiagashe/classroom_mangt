@@ -22,7 +22,7 @@ class FeesController extends Controller
         $totalCollection = \App\Models\FeePayment::sum('amount');
         
         // Total Pending = SUM of (total_fee - paid_amount) across all admissions
-        $totalPending = Admission::sum('total_fee') - Admission::sum('paid_amount');
+        $totalPending = max(0, Admission::sum('total_fee') - Admission::sum('paid_amount'));
         
         // Paid Students = COUNT where paid_amount is greater than or equal to total_fee
         $paidCount = Admission::whereColumn('paid_amount', '>=', 'total_fee')->count();
@@ -81,8 +81,12 @@ class FeesController extends Controller
             $totalPaidFromPayments = $admission->feePayments->sum('amount');
             if ($totalPaidFromPayments > $paidAmount) {
                 $paidAmount = $totalPaidFromPayments;
-                $pendingAmount = $totalFee - $paidAmount;
             }
+            
+            // Ensure paid amount does not exceed total fee
+            $paidAmount = min($totalFee, $paidAmount);
+            // Ensure pending amount never shows as negative
+            $pendingAmount = max(0, $totalFee - $paidAmount);
             
             $paymentMode = strtolower(trim($admission->payment_mode ?? 'cash'));
             $paymentModeDisplay = match($paymentMode) {

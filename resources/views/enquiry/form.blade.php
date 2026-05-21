@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function () {
             successMessage.style.transition = 'opacity 0.5s ease-out';
             successMessage.style.opacity = '0';
             setTimeout(() => successMessage.remove(), 500);
-        }, 10000);
+        }, 5000);
     }
 
     // Helper: Show error

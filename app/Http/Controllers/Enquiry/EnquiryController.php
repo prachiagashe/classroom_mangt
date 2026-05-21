@@ -619,4 +619,29 @@ public function update(Request $request, $id)
             return redirect()->back()->with('error', 'Error during import: ' . $e->getMessage());
         }
     }
+
+    public function destroy($id)
+    {
+        $enquiry = Enquiry::findOrFail($id);
+
+        if (strtolower($enquiry->status) === 'confirmed') {
+            return back()->with('error', 'Confirmed admission enquiries cannot be deleted.');
+        }
+
+        \DB::beginTransaction();
+        try {
+            // Delete related follow-ups
+            \App\Models\FollowUp::where('enquiry_id', $id)->delete();
+            
+            // Delete enquiry
+            $enquiry->delete();
+
+            \DB::commit();
+            return back()->with('success', 'Enquiry deleted successfully.');
+        } catch (\Exception $e) {
+            \DB::rollback();
+            \Log::error("Failed to delete enquiry {$id}: " . $e->getMessage());
+            return back()->with('error', 'Failed to delete enquiry: ' . $e->getMessage());
+        }
+    }
 }
