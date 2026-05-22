@@ -110,16 +110,16 @@ class EmployeeController extends Controller
             'experience_type' => 'required|in:fresher,experienced',
             
             // Experience Details Validation
-            'experience_organization.*' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
-            'experience_role.*' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
-            'experience_start_date.*' => 'required|date|before_or_equal:today',
-            'experience_end_date.*' => 'required|date|after:experience_start_date.*',
+            'experience_organization.*' => 'required_if:experience_type,experienced|nullable|string|max:255|regex:/^[A-Za-z\s]+$/',
+            'experience_role.*' => 'required_if:experience_type,experienced|nullable|string|max:255|regex:/^[A-Za-z\s]+$/',
+            'experience_start_date.*' => 'required_if:experience_type,experienced|nullable|date|before_or_equal:today',
+            'experience_end_date.*' => 'required_if:experience_type,experienced|nullable|date|after:experience_start_date.*',
             'experience_total.*' => 'nullable|string|max:100',
             
             // Academic Assignment Validation
-            'assigned_classes' => 'required_if:designation,teacher,Teacher|nullable|array',
+            'assigned_classes' => 'required_if:designation,teacher,Teacher|nullable|array|min:1',
             'assigned_classes.*' => 'nullable|string|max:50',
-            'assigned_subjects' => 'required_if:designation,teacher,Teacher|nullable|array',
+            'assigned_subjects' => 'required_if:designation,teacher,Teacher|nullable|array|min:1',
             'assigned_subjects.*' => 'nullable|string|max:50',
         ], [
             // Personal Information Error Messages
@@ -237,12 +237,20 @@ class EmployeeController extends Controller
             // Determine active/inactive status relative to today's date
             $calculatedStatus = strtotime($request->joining_date) > strtotime(date('Y-m-d')) ? 'Inactive' : 'Active';
 
+            // Clean up name parts to prevent duplication
+            $allNames = trim($request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name);
+            $words = array_values(array_unique(array_filter(explode(' ', $allNames))));
+            
+            $cleanFirstName = $words[0] ?? $request->first_name;
+            $cleanLastName = count($words) > 1 ? array_pop($words) : $request->last_name;
+            $cleanMiddleName = count($words) > 1 ? implode(' ', array_slice($words, 1)) : null;
+
             // Create employee
             $employee = Employee::create([
                 'employee_code' => $employeeCode,
-                'first_name' => $request->first_name,
-                'middle_name' => $request->middle_name,
-                'last_name' => $request->last_name,
+                'first_name' => $cleanFirstName,
+                'middle_name' => $cleanMiddleName,
+                'last_name' => $cleanLastName,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'date_of_birth' => $request->date_of_birth,
@@ -366,9 +374,9 @@ class EmployeeController extends Controller
             'experience_total.*' => 'nullable|string|max:100',
             
             // Academic assignment validation
-            'assigned_classes' => 'nullable|array',
+            'assigned_classes' => 'nullable|array|min:1',
             'assigned_classes.*' => 'nullable|string|max:50',
-            'assigned_subjects' => 'nullable|array',
+            'assigned_subjects' => 'nullable|array|min:1',
             'assigned_subjects.*' => 'nullable|string|max:50',
         ], [
             'phone.required' => 'Mobile number is required.',
@@ -418,11 +426,19 @@ class EmployeeController extends Controller
                 }
             }
 
+            // Clean up name parts to prevent duplication
+            $allNames = trim($request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name);
+            $words = array_values(array_unique(array_filter(explode(' ', $allNames))));
+            
+            $cleanFirstName = $words[0] ?? $request->first_name;
+            $cleanLastName = count($words) > 1 ? array_pop($words) : $request->last_name;
+            $cleanMiddleName = count($words) > 1 ? implode(' ', array_slice($words, 1)) : null;
+
             // Update employee
             $employee->update([
-                'first_name' => $request->first_name,
-                'middle_name' => $request->middle_name,
-                'last_name' => $request->last_name,
+                'first_name' => $cleanFirstName,
+                'middle_name' => $cleanMiddleName,
+                'last_name' => $cleanLastName,
                 'date_of_birth' => $request->date_of_birth,
                 'gender' => $request->gender,
                 'phone' => $request->phone,

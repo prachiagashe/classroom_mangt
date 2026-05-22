@@ -357,148 +357,62 @@
                     <!-- Assigned Classes -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Assigned Classes</label>
-                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                        <!-- Assigned Classes -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             @php
+                                $classesList = ['5th','6th','7th','8th','9th','10th','11th','12th'];
                                 $selectedClasses = old('assigned_classes', $employee->assigned_classes) ? explode(', ', old('assigned_classes', $employee->assigned_classes)) : [];
                             @endphp
                             
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="5th" 
-                                    @if(in_array('5th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">5th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="6th" 
-                                    @if(in_array('6th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">6th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="7th" 
-                                    @if(in_array('7th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">7th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="8th" 
-                                    @if(in_array('8th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">8th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="9th" 
-                                    @if(in_array('9th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">9th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="10th" 
-                                    @if(in_array('10th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">10th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="11th" 
-                                    @if(in_array('11th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">11th Class</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_classes[]" value="12th" 
-                                    @if(in_array('12th', $selectedClasses)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">12th Class</span>
-                            </label>
+                            @foreach($classesList as $class)
+                                <div class="class-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
+                                     onclick="toggleSelection(this, '{{$class}}', 'class')">
+                                    <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    <span>{{$class}} Class</span>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Hidden Checkboxes for Classes Submission -->
+                        <div class="hidden">
+                            @foreach($classesList as $class)
+                                <input type="checkbox" id="hidden_class_{{str_replace(' ', '_', $class)}}" name="assigned_classes[]" value="{{$class}}" @if(in_array($class, $selectedClasses)) checked @endif>
+                            @endforeach
                         </div>
                         @error('assigned_classes')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">Select all classes this teacher will handle</p>
+                        <p class="text-xs text-gray-500 mt-2">Select all classes this teacher will handle</p>
                     </div>
                     
                     <!-- Assigned Subjects -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Assigned Subjects</label>
-                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             @php
+                                $subjectsList = ['Math', 'Science', 'English', 'Hindi', 'Social Studies', 'Computer Science', 'Physics', 'Chemistry', 'Biology'];
                                 $selectedSubjects = old('assigned_subjects', $employee->assigned_subjects) ? explode(', ', old('assigned_subjects', $employee->assigned_subjects)) : [];
                             @endphp
                             
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Math" 
-                                    @if(in_array('Math', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Math</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Science" 
-                                    @if(in_array('Science', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Science</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="English" 
-                                    @if(in_array('English', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">English</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Hindi" 
-                                    @if(in_array('Hindi', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Hindi</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Social Studies" 
-                                    @if(in_array('Social Studies', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Social Studies</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Computer Science" 
-                                    @if(in_array('Computer Science', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Computer Science</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Physics" 
-                                    @if(in_array('Physics', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Physics</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Chemistry" 
-                                    @if(in_array('Chemistry', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Chemistry</span>
-                            </label>
-                            
-                            <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                                <input type="checkbox" name="assigned_subjects[]" value="Biology" 
-                                    @if(in_array('Biology', $selectedSubjects)) checked @endif
-                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Biology</span>
-                            </label>
+                            @foreach($subjectsList as $sub)
+                                <div class="subject-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
+                                     onclick="toggleSelection(this, '{{$sub}}', 'subject')">
+                                    <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    <span>{{$sub}}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Hidden Checkboxes for Subjects Submission -->
+                        <div class="hidden">
+                            @foreach($subjectsList as $sub)
+                                <input type="checkbox" id="hidden_subject_{{str_replace(' ', '_', $sub)}}" name="assigned_subjects[]" value="{{$sub}}" @if(in_array($sub, $selectedSubjects)) checked @endif>
+                            @endforeach
                         </div>
                         @error('assigned_subjects')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">Select all subjects this teacher will handle</p>
+                        <p class="text-xs text-gray-500 mt-2">Select all subjects this teacher will handle</p>
                     </div>
                 </div>
             </div>
@@ -520,8 +434,76 @@
 </div>
 
 <script>
+let selectedClasses = [];
+let selectedSubjects = [];
+
+function toggleSelection(cardElement, value, type) {
+    const isClass = type === 'class';
+    const arr = isClass ? selectedClasses : selectedSubjects;
+    const hiddenCheckboxId = isClass ? 'hidden_class_' + value.replace(/\s+/g, '_') : 'hidden_subject_' + value.replace(/\s+/g, '_');
+    const hiddenCheckbox = document.getElementById(hiddenCheckboxId);
+    
+    const index = arr.indexOf(value);
+    
+    if (index !== -1) {
+        // It was selected, now deselect it
+        arr.splice(index, 1);
+        if (hiddenCheckbox) hiddenCheckbox.checked = false;
+        
+        // Update UI
+        cardElement.classList.remove('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+        cardElement.classList.add('bg-white', 'border-gray-300', 'text-gray-600');
+        const icon = cardElement.querySelector('.check-icon');
+        if(icon) icon.classList.add('hidden');
+    } else {
+        // It was not selected, now select it
+        arr.push(value);
+        if (hiddenCheckbox) hiddenCheckbox.checked = true;
+        
+        // Update UI
+        cardElement.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+        cardElement.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+        const icon = cardElement.querySelector('.check-icon');
+        if(icon) icon.classList.remove('hidden');
+    }
+}
+
+function initSelections() {
+    // Initialize from hidden checkboxes which hold the 'old' values
+    document.querySelectorAll('input[id^="hidden_class_"]').forEach(cb => {
+        if (cb.checked) {
+            selectedClasses.push(cb.value);
+            // find corresponding card and activate
+            document.querySelectorAll('.class-card').forEach(card => {
+                if (card.innerText.trim() === cb.value.trim() + ' Class') {
+                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+                    const icon = card.querySelector('.check-icon');
+                    if(icon) icon.classList.remove('hidden');
+                }
+            });
+        }
+    });
+    
+    document.querySelectorAll('input[id^="hidden_subject_"]').forEach(cb => {
+        if (cb.checked) {
+            selectedSubjects.push(cb.value);
+            // find corresponding card and activate
+            document.querySelectorAll('.subject-card').forEach(card => {
+                if (card.innerText.trim() === cb.value.trim()) {
+                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+                    const icon = card.querySelector('.check-icon');
+                    if(icon) icon.classList.remove('hidden');
+                }
+            });
+        }
+    });
+}
+
 // Disable all form fields when validation errors are present
 document.addEventListener('DOMContentLoaded', function() {
+    initSelections();
     @if ($errors->any())
         // Disable all input fields
         const form = document.getElementById('employeeForm');

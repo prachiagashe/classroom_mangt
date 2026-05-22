@@ -240,8 +240,14 @@ public function confirm($id)
             'status' => 'confirmed'
         ]);
 
-        // WhatsApp Confirmation Message
-        app(\App\Services\WhatsAppService::class)->sendMessage('confirmation', $enquiry);
+        // WhatsApp Confirmation Message (Deferred to speed up response)
+        defer(function () use ($enquiry) {
+            try {
+                app(\App\Services\WhatsAppService::class)->sendMessage('confirmation', $enquiry);
+            } catch (\Exception $e) {
+                \Log::error('Deferred WhatsApp failed: ' . $e->getMessage());
+            }
+        });
 
         $contact = $enquiry->parent_mobile ?? $enquiry->student_mobile ?? '';
         $className = $enquiry->class ?? '';
@@ -348,8 +354,14 @@ public function confirm($id)
             $admission = \App\Models\Admission::create($admissionData);
             \Log::info('Created admission record with ID: ' . $admission->id);
 
-            // Send confirmation email
-            $this->sendAdmissionConfirmationEmail($admission->student_name, $admission->email, $admission->class);
+            // Send confirmation email (Deferred)
+            defer(function () use ($admission) {
+                try {
+                    $this->sendAdmissionConfirmationEmail($admission->student_name, $admission->email, $admission->class);
+                } catch (\Exception $e) {
+                    \Log::error('Deferred confirmation email failed: ' . $e->getMessage());
+                }
+            });
 
             // Create corresponding fee_payment record
             $feeAmount = $admissionData['total_fee'];
@@ -381,35 +393,48 @@ public function confirm($id)
 
                     \Log::info('Student account created for ' . $enquiry->email);
                     
-                    $this->sendStudentLoginCredentialsEmail(
-                        $admission->student_name, 
-                        $enquiry->email, 
-                        $tempPassword, 
-                        route('login')
-                    );
+                    // Deferred Emails & Notifications
+                    defer(function () use ($admission, $enquiry, $tempPassword, $className, $rollNumber) {
+                        try {
+                            $this->sendStudentLoginCredentialsEmail(
+                                $admission->student_name, 
+                                $enquiry->email, 
+                                $tempPassword, 
+                                route('login')
+                            );
 
-                    // Send welcome notification to the new student
-                    $newUser = \App\Models\User::where('email', $enquiry->email)->first();
-                    if ($newUser) {
-                        NotificationService::notifyUser(
-                            $newUser->id,
-                            'Admission Confirmed',
-                            "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
-                            'admission',
-                            ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
-                        );
-                    }
+                            // Send welcome notification to the new student
+                            $newUser = \App\Models\User::where('email', $enquiry->email)->first();
+                            if ($newUser) {
+                                \App\Services\NotificationService::notifyUser(
+                                    $newUser->id,
+                                    'Admission Confirmed',
+                                    "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
+                                    'admission',
+                                    ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            \Log::error('Deferred account emails/notifications failed: ' . $e->getMessage());
+                        }
+                    });
                 } else {
                     \Log::info('Student account for ' . $enquiry->email . ' already exists, skipping creation.');
                     
-                    // Notify existing student about admission
-                    NotificationService::notifyStudentByEmail(
-                        $enquiry->email,
-                        'Admission Confirmed',
-                        "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
-                        'admission',
-                        ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
-                    );
+                    // Notify existing student about admission (Deferred)
+                    defer(function () use ($enquiry, $className, $rollNumber, $admission) {
+                        try {
+                            \App\Services\NotificationService::notifyStudentByEmail(
+                                $enquiry->email,
+                                'Admission Confirmed',
+                                "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
+                                'admission',
+                                ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
+                            );
+                        } catch (\Exception $e) {
+                            \Log::error('Deferred existing student email notification failed: ' . $e->getMessage());
+                        }
+                    });
                 }
             }
         }

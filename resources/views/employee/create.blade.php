@@ -381,10 +381,18 @@
                                     $selectedClasses = old('assigned_classes') ? (is_array(old('assigned_classes')) ? old('assigned_classes') : explode(', ', old('assigned_classes'))) : [];
                                 @endphp
                                 @foreach($classes as $class)
-                                    <label class="group relative flex items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-purple-200 hover:bg-purple-50 transition-all cursor-pointer has-[:checked]:bg-purple-600 has-[:checked]:border-purple-600 has-[:checked]:shadow-lg has-[:checked]:shadow-purple-200">
-                                        <input type="checkbox" name="assigned_classes[]" value="{{$class}}" @if(in_array($class, $selectedClasses)) checked @endif class="peer hidden">
-                                        <span class="text-sm font-bold text-gray-600 group-hover:text-purple-700 peer-checked:text-white">{{$class}}</span>
-                                    </label>
+                                    <div class="class-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
+                                         onclick="toggleSelection(this, '{{$class}}', 'class')">
+                                        <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        <span>{{$class}}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Hidden Checkboxes for Classes Submission -->
+                            <div class="hidden">
+                                @foreach($classes as $class)
+                                    <input type="checkbox" id="hidden_class_{{str_replace(' ', '_', $class)}}" name="assigned_classes[]" value="{{$class}}" @if(in_array($class, $selectedClasses)) checked @endif>
                                 @endforeach
                             </div>
                         </div>
@@ -398,10 +406,18 @@
                                     $selectedSubjects = old('assigned_subjects') ? (is_array(old('assigned_subjects')) ? old('assigned_subjects') : explode(', ', old('assigned_subjects'))) : [];
                                 @endphp
                                 @foreach($subjects as $sub)
-                                    <label class="group relative flex items-center justify-center p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-all cursor-pointer has-[:checked]:bg-blue-600 has-[:checked]:border-blue-600 has-[:checked]:shadow-lg has-[:checked]:shadow-blue-200">
-                                        <input type="checkbox" name="assigned_subjects[]" value="{{$sub}}" @if(in_array($sub, $selectedSubjects)) checked @endif class="peer hidden">
-                                        <span class="text-sm font-bold text-gray-600 group-hover:text-blue-700 peer-checked:text-white">{{$sub}}</span>
-                                    </label>
+                                    <div class="subject-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
+                                         onclick="toggleSelection(this, '{{$sub}}', 'subject')">
+                                        <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        <span>{{$sub}}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Hidden Checkboxes for Subjects Submission -->
+                            <div class="hidden">
+                                @foreach($subjects as $sub)
+                                    <input type="checkbox" id="hidden_subject_{{str_replace(' ', '_', $sub)}}" name="assigned_subjects[]" value="{{$sub}}" @if(in_array($sub, $selectedSubjects)) checked @endif>
                                 @endforeach
                             </div>
                         </div>
@@ -545,6 +561,73 @@ function updateMinEndDate(input, index) {
     }
 }
 
+let selectedClasses = [];
+let selectedSubjects = [];
+
+function toggleSelection(cardElement, value, type) {
+    const isClass = type === 'class';
+    const arr = isClass ? selectedClasses : selectedSubjects;
+    const hiddenCheckboxId = isClass ? 'hidden_class_' + value.replace(/\s+/g, '_') : 'hidden_subject_' + value.replace(/\s+/g, '_');
+    const hiddenCheckbox = document.getElementById(hiddenCheckboxId);
+    
+    const index = arr.indexOf(value);
+    
+    if (index !== -1) {
+        // It was selected, now deselect it
+        arr.splice(index, 1);
+        if (hiddenCheckbox) hiddenCheckbox.checked = false;
+        
+        // Update UI
+        cardElement.classList.remove('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+        cardElement.classList.add('bg-white', 'border-gray-300', 'text-gray-600');
+        const icon = cardElement.querySelector('.check-icon');
+        if(icon) icon.classList.add('hidden');
+    } else {
+        // It was not selected, now select it
+        arr.push(value);
+        if (hiddenCheckbox) hiddenCheckbox.checked = true;
+        
+        // Update UI
+        cardElement.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+        cardElement.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+        const icon = cardElement.querySelector('.check-icon');
+        if(icon) icon.classList.remove('hidden');
+    }
+}
+
+function initSelections() {
+    // Initialize from hidden checkboxes which hold the 'old' values
+    document.querySelectorAll('input[id^="hidden_class_"]').forEach(cb => {
+        if (cb.checked) {
+            selectedClasses.push(cb.value);
+            // find corresponding card and activate
+            document.querySelectorAll('.class-card').forEach(card => {
+                if (card.innerText.trim() === cb.value.trim()) {
+                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+                    const icon = card.querySelector('.check-icon');
+                    if(icon) icon.classList.remove('hidden');
+                }
+            });
+        }
+    });
+    
+    document.querySelectorAll('input[id^="hidden_subject_"]').forEach(cb => {
+        if (cb.checked) {
+            selectedSubjects.push(cb.value);
+            // find corresponding card and activate
+            document.querySelectorAll('.subject-card').forEach(card => {
+                if (card.innerText.trim() === cb.value.trim()) {
+                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+                    const icon = card.querySelector('.check-icon');
+                    if(icon) icon.classList.remove('hidden');
+                }
+            });
+        }
+    });
+}
+
 function toggleAcademicAssignment() {
     const desigSelect = document.getElementById('designation');
     if (!desigSelect) return;
@@ -569,6 +652,7 @@ function toggleExperienceFields() {
         addBtn.classList.remove('hidden');
         inputs.forEach(input => {
             if (!input.name.includes('total')) input.setAttribute('required', 'required');
+            input.disabled = false;
         });
     } else {
         container.classList.add('hidden');
@@ -576,6 +660,7 @@ function toggleExperienceFields() {
         inputs.forEach(input => {
             input.removeAttribute('required');
             input.value = '';
+            input.disabled = true;
         });
     }
 }
@@ -679,6 +764,7 @@ function addExperienceEntry() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initSelections();
     toggleAcademicAssignment();
     toggleExperienceFields();
     toggleBankDetails();

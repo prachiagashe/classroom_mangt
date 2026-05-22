@@ -536,19 +536,7 @@ function renderCalendar(calendarData, month, year) {
     const firstDay = new Date(year, month - 1, 1).getDay();
     const daysInMonth = new Date(year, month, 0).getDate();
 
-    const hasData = Object.values(calendarData).some(d => d.status !== 'none');
-    
-    if (!hasData) {
-        container.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-10 w-full text-center">
-                <svg class="w-10 h-10 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                <p class="text-xs text-slate-400 font-medium px-6">No attendance data available for this month.</p>
-            </div>
-        `;
-        return;
-    }
+
 
     let html = `
         <div class="grid grid-cols-7 gap-1">
@@ -565,28 +553,22 @@ function renderCalendar(calendarData, month, year) {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayData = calendarData[dateStr] || { status: 'none', title: '' };
         
-        let statusClasses = 'bg-white text-slate-400 border-slate-50';
-        let statusDot = '';
+        let statusClasses = 'bg-white text-black border-gray-200';
         
         if (dayData.status === 'present') {
-            statusClasses = 'bg-emerald-50 text-emerald-700 border-emerald-100 font-bold';
-            statusDot = '<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1 shadow-sm shadow-emerald-200"></div>';
+            statusClasses = 'bg-green-500 text-white border-green-600 font-bold shadow-sm';
         } else if (dayData.status === 'absent') {
-            statusClasses = 'bg-rose-50 text-rose-700 border-rose-100 font-bold';
-            statusDot = '<div class="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1 shadow-sm shadow-rose-200"></div>';
+            statusClasses = 'bg-red-500 text-white border-red-600 font-bold shadow-sm';
         } else if (dayData.status === 'leave') {
-            statusClasses = 'bg-amber-50 text-amber-700 border-amber-100 font-bold';
-            statusDot = '<div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1 shadow-sm shadow-amber-200"></div>';
+            statusClasses = 'bg-orange-400 text-white border-orange-500 font-bold shadow-sm';
         } else if (dayData.status === 'holiday') {
-            statusClasses = 'bg-blue-50 text-blue-700 border-blue-100 font-bold';
-            statusDot = '<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shadow-sm shadow-blue-200"></div>';
+            statusClasses = 'bg-blue-500 text-white border-blue-600 font-bold shadow-sm';
         }
         
         html += `
-            <div class="aspect-square border ${statusClasses} rounded-xl flex flex-col justify-center items-center group relative transition-all hover:scale-105 hover:shadow-sm cursor-default" 
+            <div class="aspect-square border ${statusClasses} rounded-xl flex flex-col justify-center items-center group relative transition-all hover:scale-105 hover:shadow-md cursor-default" 
                  title="${dayData.title}">
                 <span class="text-xs">${day}</span>
-                ${statusDot}
             </div>
         `;
     }
@@ -651,20 +633,20 @@ document.addEventListener('keydown', function(event) {
             <!-- Legend -->
             <div class="mt-6 flex justify-center gap-6">
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Present</span>
+                    <div class="w-3 h-3 rounded bg-green-500"></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Present</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-rose-500"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Absent</span>
+                    <div class="w-3 h-3 rounded bg-red-500"></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Absent</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Leave</span>
+                    <div class="w-3 h-3 rounded bg-orange-400"></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Leave</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Holiday</span>
+                    <div class="w-3 h-3 rounded bg-blue-500"></div>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Holiday</span>
                 </div>
             </div>
         </div>
