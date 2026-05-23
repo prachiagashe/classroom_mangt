@@ -38,84 +38,7 @@
                 <form class="space-y-6" action="{{ route('teacher.register.post') }}" method="POST">
                     @csrf
                     
-                    <!-- Name Field -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                            </div>
-                            <input 
-                                id="name" 
-                                name="name" 
-                                type="text" 
-                                required
-                                value="{{ old('name') }}"
-                                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                placeholder="Enter your full name"
-                            >
-                        </div>
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Role Selection Field -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Select Your Role <span class="text-red-500">*</span>
-                        </label>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <input 
-                                    id="role_teacher" 
-                                    name="role" 
-                                    type="radio" 
-                                    value="teacher" 
-                                    required
-                                    {{ old('role') == 'teacher' ? 'checked' : '' }}
-                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                >
-                                <label for="role_teacher" class="ml-3 block text-sm font-medium text-gray-700">
-                                    <div class="flex items-center">
-                                        <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                        </svg>
-                                        Teacher
-                                    </div>
-                                    <span class="text-xs text-gray-500 ml-7">Access teacher dashboard and tools</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input 
-                                    id="role_student" 
-                                    name="role" 
-                                    type="radio" 
-                                    value="student" 
-                                    required
-                                    {{ old('role') == 'student' ? 'checked' : '' }}
-                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                >
-                                <label for="role_student" class="ml-3 block text-sm font-medium text-gray-700">
-                                    <div class="flex items-center">
-                                        <svg class="h-5 w-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-                                        </svg>
-                                        Student
-                                    </div>
-                                    <span class="text-xs text-gray-500 ml-7">Access student dashboard and resources</span>
-                                </label>
-                            </div>
-                        </div>
-                        @error('role')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
 
                     <!-- Email Field -->
                     <div>
@@ -142,7 +65,7 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-xs text-gray-500" id="email-note">
-                            Note: Email must be registered in employee database (for teachers)
+                            Note: Email must be registered in employee database
                         </p>
                     </div>
 
@@ -232,25 +155,8 @@
     <script>
         // Auto-focus first field
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('name').focus();
+            document.getElementById('email').focus();
         });
-
-        // Update email note based on role selection
-        function updateEmailNote() {
-            const teacherRadio = document.getElementById('role_teacher');
-            const studentRadio = document.getElementById('role_student');
-            const emailNote = document.getElementById('email-note');
-            
-            if (teacherRadio.checked) {
-                emailNote.textContent = 'Note: Email must be registered in employee database (for teachers)';
-            } else if (studentRadio.checked) {
-                emailNote.textContent = 'Note: Any valid email address can be used for student registration';
-            }
-        }
-
-        // Add event listeners to role radio buttons
-        document.getElementById('role_teacher').addEventListener('change', updateEmailNote);
-        document.getElementById('role_student').addEventListener('change', updateEmailNote);
 
         // Password strength indicator (optional enhancement)
         document.getElementById('password').addEventListener('input', function(e) {

@@ -78,7 +78,7 @@ class EmployeeController extends Controller
             'first_name' => 'required|string|max:50|regex:/^[A-Za-z\s]+$/',
             'middle_name' => 'nullable|string|max:50|regex:/^[A-Za-z\s]+$/',
             'last_name' => 'required|string|max:50|regex:/^[A-Za-z\s]+$/',
-            'email' => 'required|email:rfc,dns|regex:/^[A-Za-z0-9._%+-]+@[A-Za-z.-]+\.[A-Za-z]{2,}$/|unique:employees,email|unique:users,email|max:255',
+            'email' => 'required|email:rfc,dns|regex:/^[A-Za-z0-9._%+-]+@[A-Za-z.-]+\.[A-Za-z]{2,}$/|unique:employees,email|max:255',
             'phone' => 'required|regex:/^[6-9][0-9]{9}$/|not_in:0000000000',
             'date_of_birth' => 'required|date|after:1950-01-01|before:-18 years',
             'gender' => 'required|in:male,female,other',
@@ -280,30 +280,9 @@ class EmployeeController extends Controller
                 $employee->designation
             );
 
-            // Create user account if designation is Teacher
-            if (strtolower($request->designation) === 'teacher') {
-                $user = User::create([
-                    'name' => $request->first_name . ' ' . $request->last_name,
-                    'email' => $request->email,
-                    'password' => null, // Will be set via setup link
-                    'role' => 'teacher',
-                ]);
-
-                // Generate password setup link
-                $token = Password::getRepository()->create($user);
-                $setupUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
-
-                // Send password setup email
-                $this->sendTeacherPasswordSetupEmail(
-                    $employee->first_name . ' ' . $employee->last_name, 
-                    $employee->email, 
-                    $setupUrl
-                );
-            }
-
             return redirect()
                 ->route('employee.index')
-                ->with('success', 'Employee added successfully.' . ($request->designation === 'Teacher' ? ' Teacher account created and password setup email sent.' : ''));
+                ->with('success', 'Employee added successfully.');
 
         } catch (\Exception $e) {
             return redirect()

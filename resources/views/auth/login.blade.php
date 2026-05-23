@@ -243,7 +243,7 @@ function togglePassword() {
             </div>
             
             <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                Successful
+                {{ session('success_title') ?? 'Successful' }}
             </h3>
             <p class="text-sm text-gray-500 mb-6">
                 {{ session('enquiry_success') ?? session('success') }}
@@ -258,10 +258,10 @@ function togglePassword() {
     </div>
 
     <script>
-        // Auto-close after 10 seconds
+        // Auto-close after 5 seconds
         setTimeout(function() {
             closeSuccessModal();
-        }, 10000);
+        }, 5000);
 
         function closeSuccessModal() {
             const modal = document.getElementById('successModal');

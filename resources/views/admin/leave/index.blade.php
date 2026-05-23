@@ -89,17 +89,7 @@
         </div>
     </div>
 
-    <!-- Success Messages -->
-    @if(session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 shadow-sm">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <p class="font-medium">{{ session('success') }}</p>
-            </div>
-        </div>
-    @endif
+    <!-- Success/Error Messages handled via SweetAlert2 below -->
 
     <!-- Main Module Tabs -->
     <div class="mb-6">
@@ -466,13 +456,13 @@
                                                     </button>
                                                     
                                                     @if($request->status === 'pending')
-                                                        <form action="{{ route('admin.leave.approve', $request->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to approve this leave?')">
+                                                        <form id="approve-form-{{ $request->id }}" action="{{ route('admin.leave.approve', $request->id) }}" method="POST">
                                                             @csrf
-                                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Approve">
+                                                            <button type="button" onclick="confirmApprove('approve-form-{{ $request->id }}')" class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Approve">
                                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                                             </button>
                                                         </form>
-                                                        <button onclick="openRejectModal({{ $request->id }})" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Reject">
+                                                        <button onclick="confirmReject({{ $request->id }})" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Reject">
                                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
                                                     @endif
@@ -637,32 +627,7 @@
     </div>
 </div>
 
-<!-- Reject Modal -->
-<div id="rejectModal" class="modal-backdrop-ptm" onclick="if(event.target === this) closeRejectModal()">
-    <div class="modal-container-ptm animate-fade-in-up" style="max-width: 500px;">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-800">Reject Leave Request</h3>
-            <button onclick="closeRejectModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <form action="{{ route('admin.leave.reject', ':id') }}" method="POST" id="rejectForm">
-            @csrf
-            <div class="p-6 space-y-4">
-                <div>
-                    <label for="admin_remark" class="block text-sm font-medium text-gray-700 mb-2">Rejection Reason <span class="text-red-500">*</span></label>
-                    <textarea name="admin_remark" id="admin_remark" rows="4" required
-                        placeholder="Please provide a reason for rejection..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none text-sm"></textarea>
-                </div>
-            </div>
-            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <button type="button" onclick="closeRejectModal()" class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-gray-800 transition-all">CANCEL</button>
-                <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow-lg shadow-red-100 hover:bg-red-700 transition-all">REJECT LEAVE</button>
-            </div>
-        </form>
-    </div>
-</div>
+<!-- Old Reject Modal removed in favor of SweetAlert2 -->
 
 <script>
 // Tab Switching
@@ -1222,5 +1187,115 @@ document.addEventListener('keydown', function(event) {
         closeLeaveDetailModal();
     }
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// SweetAlert2 Toasts for Success/Error
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 5000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
+
+@if(session('success'))
+    Toast.fire({
+        icon: 'success',
+        title: "{{ session('success') }}"
+    });
+@endif
+
+@if(session('error'))
+    Toast.fire({
+        icon: 'error',
+        title: "{{ session('error') }}"
+    });
+@endif
+
+// SweetAlert2 Confirm Modals
+function confirmApprove(formId) {
+    Swal.fire({
+        title: 'Are you sure you want to approve this leave request?',
+        text: 'This action will update the employee leave status.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981', // green-500
+        cancelButtonColor: '#64748b', // slate-500
+        confirmButtonText: 'Approve',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl border border-gray-100',
+            title: 'text-xl font-bold text-gray-800',
+            htmlContainer: 'text-sm text-gray-500',
+            confirmButton: 'rounded-lg font-bold shadow-lg shadow-green-100 px-6 py-2.5 transition-all',
+            cancelButton: 'rounded-lg font-bold px-6 py-2.5 transition-all'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(formId).submit();
+        }
+    });
+}
+
+function confirmReject(leaveId) {
+    Swal.fire({
+        title: 'Are you sure you want to reject this leave request?',
+        text: 'This action will mark the leave request as rejected.',
+        icon: 'warning',
+        input: 'textarea',
+        inputPlaceholder: 'Please provide a reason for rejection... (Required)',
+        inputAttributes: {
+            'aria-label': 'Reason for rejection',
+            'required': 'true'
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444', // red-500
+        cancelButtonColor: '#64748b', // slate-500
+        confirmButtonText: 'Reject',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            popup: 'rounded-2xl shadow-xl border border-gray-100',
+            title: 'text-xl font-bold text-gray-800',
+            htmlContainer: 'text-sm text-gray-500',
+            confirmButton: 'rounded-lg font-bold shadow-lg shadow-red-100 px-6 py-2.5 transition-all',
+            cancelButton: 'rounded-lg font-bold px-6 py-2.5 transition-all',
+            input: 'rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-3 text-sm resize-y outline-none'
+        },
+        preConfirm: (remark) => {
+            if (!remark || remark.trim() === '') {
+                Swal.showValidationMessage('Rejection reason is required');
+                return false;
+            }
+            return remark;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Create and submit form for rejection
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/leave/reject/${leaveId}`;
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+            
+            const remarkInput = document.createElement('input');
+            remarkInput.type = 'hidden';
+            remarkInput.name = 'admin_remark';
+            remarkInput.value = result.value;
+            
+            form.appendChild(csrfInput);
+            form.appendChild(remarkInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
 </script>
 @endpush

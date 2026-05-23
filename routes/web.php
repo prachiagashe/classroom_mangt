@@ -25,6 +25,7 @@ use App\Http\Controllers\Employee\EmployeeController;
 */
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/teacher/login', [AuthController::class, 'showLogin'])->name('teacher.login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -34,8 +35,8 @@ Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->nam
 Route::post('/reset-password/update', [AuthController::class, 'updatePassword'])->name('password.update');
 
 // Teacher Registration Routes
-Route::get('/register', [TeacherRegistrationController::class, 'showRegistrationForm'])->name('teacher.register');
-Route::post('/register', [TeacherRegistrationController::class, 'register'])->name('teacher.register.post');
+Route::get('/teacher/register', [TeacherRegistrationController::class, 'showRegistrationForm'])->name('teacher.register');
+Route::post('/teacher/register', [TeacherRegistrationController::class, 'register'])->name('teacher.register.post');
 
 
 /*
@@ -346,8 +347,7 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
 });
 
 // ... (rest of the code remains the same)
-Route::get('/teacher/password/setup/{token}', [App\Http\Controllers\Auth\TeacherPasswordSetupController::class, 'showSetupForm'])->name('teacher.password.setup.form');
-Route::post('/teacher/password/setup', [App\Http\Controllers\Auth\TeacherPasswordSetupController::class, 'setup'])->name('teacher.password.setup');
+// Removed Teacher Password Setup Routes
 
 // Salary Management routes
 Route::middleware('auth')->group(function () {

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Traits\SendsAuthEmails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 
 class TeacherRegistrationController extends Controller
@@ -27,42 +28,53 @@ class TeacherRegistrationController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:teacher,student'],
         ]);
 
-        // Check if email exists in employees table (only for teachers)
-        if ($request->role === 'teacher') {
-            $employee = Employee::where('email', $request->email)->first();
-            if (!$employee) {
-                return back()
-                    ->withErrors(['email' => 'This email is not registered in the employee database. Please contact admin.'])
-                    ->withInput($request->except('password', 'password_confirmation'));
-            }
+        // Check if email exists in employees table
+        $employee = Employee::where('email', $request->email)->first();
+        if (!$employee) {
+            return back()
+                ->withErrors(['email' => 'This email is not registered by admin.'])
+                ->withInput($request->except('password', 'password_confirmation'));
         }
 
         // Check if email already exists in users table
         if (User::where('email', $request->email)->exists()) {
             return back()
-                ->withErrors(['email' => 'This email is already registered. Please login.'])
+                ->withErrors(['email' => 'Account already exists. Please login.'])
                 ->withInput($request->except('password', 'password_confirmation'));
         }
 
+        // Construct name from employee record
+        $nameParts = array_filter([$employee->first_name, $employee->middle_name, $employee->last_name]);
+        $fullName = implode(' ', $nameParts);
+
         // Create new user
         $user = User::create([
-            'name' => $request->name,
+            'name' => $fullName,
             'email' => $request->email,
+            'phone' => $employee->phone ?? '',
             'password' => Hash::make($request->password),
-            'role' => $request->role, // Use selected role
+            'role' => 'teacher',
+            'is_first_login' => 0,
         ]);
 
-        // Send registration confirmation email
-        $this->sendRegistrationConfirmationEmail($user->name, $user->email, $user->role);
+        // Send confirmation email
+        \Illuminate\Support\Facades\Mail::to($user->email)->send(
+            new \App\Mail\TeacherRegistrationConfirmation(
+                $fullName,
+                $user->email,
+                $employee->department ?? 'N/A',
+                $employee->assigned_classes ?? 'N/A',
+                $employee->assigned_subjects ?? 'N/A'
+            )
+        );
 
-        // Redirect to login page with success message
-        return redirect()->route('login')
-            ->with('success', 'Registration successful. You can now log in to your account.');
+        // Redirect to teacher login
+        return redirect()->route('teacher.login')
+            ->with('success_title', 'Registration Successful')
+            ->with('success', 'Your teacher account has been created successfully. Please login to continue.');
     }
 }
