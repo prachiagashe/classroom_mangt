@@ -184,7 +184,7 @@
                             Login
                         </button>
                         
-                        <a href="{{ route('teacher.register') }}" 
+                        <a href="{{ route('register') }}" 
                            class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center">
                             <i class="fas fa-user-plus mr-2"></i>
                             Register
@@ -227,53 +227,27 @@ function togglePassword() {
 }
 </script>
 
-@if(session('enquiry_success') || session('success'))
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform transition-all scale-100">
-            <!-- Green Check Icon -->
-            <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-50 mb-6 relative">
-                <svg class="h-10 w-10 text-green-500 rounded-full border-2 border-green-500 p-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <!-- Decorative elements -->
-                <div class="absolute -top-1 -right-1 w-2 h-2 border border-green-300 rounded-full"></div>
-                <div class="absolute bottom-2 -left-2 w-3 h-3 bg-green-100 rounded-full"></div>
-                <div class="absolute top-4 -left-4 text-green-300 text-xl font-bold leading-none">+</div>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                {{ session('success_title') ?? 'Successful' }}
-            </h3>
-            <p class="text-sm text-gray-500 mb-6">
-                {{ session('enquiry_success') ?? session('success') }}
-            </p>
-            
-            <div class="border-t border-gray-100 pt-6">
-                <button type="button" onclick="closeSuccessModal()" class="w-full inline-flex justify-center items-center rounded-full px-6 py-3 bg-[#69be28] hover:bg-[#5aa322] text-white text-sm font-semibold tracking-wide transition-colors">
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-
+    <!-- SweetAlert2 Initialization -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Auto-close after 5 seconds
-        setTimeout(function() {
-            closeSuccessModal();
-        }, 5000);
-
-        function closeSuccessModal() {
-            const modal = document.getElementById('successModal');
-            if (modal) {
-                modal.classList.add('opacity-0');
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                }, 300);
-            }
-        }
+        @if(session('enquiry_success') || session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: "{{ session('success_title') ?? 'Successful' }}",
+                text: "{!! session('enquiry_success') ?? session('success') !!}",
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
+        
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "{!! session('error') !!}",
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
     </script>
-@endif
 
 </body>
 </html>

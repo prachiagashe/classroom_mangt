@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration - CRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div class="min-h-screen flex items-center justify-center px-4">
@@ -35,10 +36,29 @@
                     </div>
                 @endif
 
-                <form class="space-y-6" action="{{ route('teacher.register.post') }}" method="POST">
+                <form class="space-y-6" action="{{ route('register.post') }}" method="POST">
                     @csrf
                     
+                    <!-- Role Selection (Compact Radio Options) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Register As: <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="radio" name="role" value="student" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" required {{ old('role') == 'student' ? 'checked' : '' }}>
+                                <span class="ml-2 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">🎓 Student</span>
+                            </label>
 
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="radio" name="role" value="teacher" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" required {{ old('role') == 'teacher' ? 'checked' : '' }}>
+                                <span class="ml-2 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">💼 Teacher</span>
+                            </label>
+                        </div>
+                        @error('role')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                     <!-- Email Field -->
                     <div>
@@ -65,7 +85,7 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-xs text-gray-500" id="email-note">
-                            Note: Email must be registered in employee database
+                            Note: Email must be registered in the respective database
                         </p>
                     </div>
 
@@ -188,6 +208,27 @@
             indicator.className = `mt-1 text-xs text-${colors[strength]}-600`;
             indicator.textContent = `Password strength: ${texts[strength]}`;
         });
+    </script>
+
+    <!-- SweetAlert2 Initialization -->
+    <script>
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
+        
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Registration Successful',
+                text: "{{ session('success') }}",
+                confirmButtonColor: '#3b82f6'
+            });
+        @endif
     </script>
 </body>
 </html>

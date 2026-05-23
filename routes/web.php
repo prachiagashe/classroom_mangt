@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Auth\TeacherRegistrationController;
 use App\Http\Controllers\Teacher\ScheduleController;
 use App\Http\Controllers\Enquiry\DashboardController;
 use App\Http\Controllers\Enquiry\EnquiryController;
@@ -34,9 +33,9 @@ Route::post('/forgot-password', [AuthController::class, 'sendOtp'])->name('passw
 Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
 Route::post('/reset-password/update', [AuthController::class, 'updatePassword'])->name('password.update');
 
-// Teacher Registration Routes
-Route::get('/teacher/register', [TeacherRegistrationController::class, 'showRegistrationForm'])->name('teacher.register');
-Route::post('/teacher/register', [TeacherRegistrationController::class, 'register'])->name('teacher.register.post');
+// Unified Registration Routes
+Route::get('/register', [\App\Http\Controllers\Auth\RegistrationController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [\App\Http\Controllers\Auth\RegistrationController::class, 'register'])->name('register.post');
 
 
 /*
