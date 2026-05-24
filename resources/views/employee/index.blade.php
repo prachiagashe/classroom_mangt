@@ -502,21 +502,21 @@ async function fetchAttendanceCalendar() {
             
             // Update Summary Counts
             summary.innerHTML = `
-                <div class="bg-emerald-50/50 border border-emerald-100 p-2.5 rounded-xl text-center">
-                    <p class="text-[8px] text-emerald-600 font-black uppercase tracking-tighter mb-0.5">Present</p>
-                    <p class="text-xs font-black text-emerald-700">${data.counts.present}</p>
+                <div class="p-2.5 rounded-xl text-center border" style="background-color: #ECFDF5; border-color: #D1FAE5;">
+                    <p class="text-[8px] font-black uppercase tracking-tighter mb-0.5" style="color: #059669;">Present</p>
+                    <p class="text-xs font-black" style="color: #047857;">${data.counts.present}</p>
                 </div>
-                <div class="bg-rose-50/50 border border-rose-100 p-2.5 rounded-xl text-center">
-                    <p class="text-[8px] text-rose-600 font-black uppercase tracking-tighter mb-0.5">Absent</p>
-                    <p class="text-xs font-black text-rose-700">${data.counts.absent}</p>
+                <div class="p-2.5 rounded-xl text-center border" style="background-color: #FFF1F2; border-color: #FFE4E6;">
+                    <p class="text-[8px] font-black uppercase tracking-tighter mb-0.5" style="color: #E11D48;">Absent</p>
+                    <p class="text-xs font-black" style="color: #BE123C;">${data.counts.absent}</p>
                 </div>
-                <div class="bg-amber-50/50 border border-amber-100 p-2.5 rounded-xl text-center">
-                    <p class="text-[8px] text-amber-600 font-black uppercase tracking-tighter mb-0.5">Leaves</p>
-                    <p class="text-xs font-black text-amber-700">${data.counts.leave}</p>
+                <div class="p-2.5 rounded-xl text-center border" style="background-color: #FFFBEB; border-color: #FEF3C7;">
+                    <p class="text-[8px] font-black uppercase tracking-tighter mb-0.5" style="color: #D97706;">Leaves</p>
+                    <p class="text-xs font-black" style="color: #B45309;">${data.counts.leave}</p>
                 </div>
-                <div class="bg-blue-50/50 border border-blue-100 p-2.5 rounded-xl text-center">
-                    <p class="text-[8px] text-blue-600 font-black uppercase tracking-tighter mb-0.5">Holidays</p>
-                    <p class="text-xs font-black text-blue-700">${data.counts.holiday}</p>
+                <div class="p-2.5 rounded-xl text-center border" style="background-color: #EFF6FF; border-color: #DBEAFE;">
+                    <p class="text-[8px] font-black uppercase tracking-tighter mb-0.5" style="color: #2563EB;">Holidays</p>
+                    <p class="text-xs font-black" style="color: #1D4ED8;">${data.counts.holiday}</p>
                 </div>
             `;
             
@@ -554,21 +554,26 @@ function renderCalendar(calendarData, month, year) {
         const dayData = calendarData[dateStr] || { status: 'none', title: '' };
         
         let statusClasses = 'bg-white text-black border-gray-200';
+        let innerHtml = `<span class="text-xs">${day}</span>`;
+        let inlineStyle = '';
         
         if (dayData.status === 'present') {
             statusClasses = 'bg-green-500 text-white border-green-600 font-bold shadow-sm';
         } else if (dayData.status === 'absent') {
             statusClasses = 'bg-red-500 text-white border-red-600 font-bold shadow-sm';
         } else if (dayData.status === 'leave') {
-            statusClasses = 'bg-orange-400 text-white border-orange-500 font-bold shadow-sm';
+            statusClasses = 'font-bold shadow-sm';
+            inlineStyle = 'background-color: #FFF8E1; color: #B45309; border-color: #FDE68A;';
+            innerHtml += `<span class="absolute bottom-0.5 right-1 text-[7px] font-black" style="color: #B45309;">L</span>`;
         } else if (dayData.status === 'holiday') {
             statusClasses = 'bg-blue-500 text-white border-blue-600 font-bold shadow-sm';
         }
         
         html += `
             <div class="aspect-square border ${statusClasses} rounded-xl flex flex-col justify-center items-center group relative transition-all hover:scale-105 hover:shadow-md cursor-default" 
+                 style="${inlineStyle}"
                  title="${dayData.title}">
-                <span class="text-xs">${day}</span>
+                ${innerHtml}
             </div>
         `;
     }
@@ -587,7 +592,7 @@ document.addEventListener('keydown', function(event) {
 <!-- Attendance Calendar Modal (Square PTM Style) -->
 <div id="attendanceCalendarModal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-4">
     <!-- Premium Backdrop Overlay -->
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeAttendanceCalendarModal()"></div>
+    <div class="absolute inset-0 animate-in fade-in duration-300" style="background-color: rgba(0, 0, 0, 0.45);" onclick="closeAttendanceCalendarModal()"></div>
     
     <!-- Modal Container (Compact Square) -->
     <div id="attendanceCalendarPopup" class="relative w-[500px] bg-white rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col">
@@ -641,7 +646,7 @@ document.addEventListener('keydown', function(event) {
                     <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Absent</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded bg-orange-400"></div>
+                    <div class="w-3 h-3 rounded" style="background-color: #FDE68A; border: 1px solid #FCD34D;"></div>
                     <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Leave</span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -653,9 +658,7 @@ document.addEventListener('keydown', function(event) {
 
         <!-- Footer -->
         <div class="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 flex-shrink-0">
-            <button onclick="closeAttendanceCalendarModal()" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all shadow-sm">
-                Cancel
-            </button>
+           
             <button onclick="closeAttendanceCalendarModal()" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:shadow-blue-200 transition-all">
                 Close
             </button>

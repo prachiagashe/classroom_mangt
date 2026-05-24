@@ -216,20 +216,10 @@
                                                     PUBLIC HOLIDAY
                                                 </span>
                                             @elseif($onLeave)
-                                                {{-- Leave Badge + Disabled Buttons --}}
-                                                <div class="flex items-center gap-3">
-                                                    <span class="px-4 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold border border-amber-200 shadow-sm">
-                                                        LEAVE
-                                                    </span>
-                                                    <div class="flex gap-2 opacity-50">
-                                                        <button disabled class="px-4 py-1.5 bg-white border border-gray-300 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider cursor-not-allowed">
-                                                            Present
-                                                        </button>
-                                                        <button disabled class="px-4 py-1.5 bg-white border border-gray-300 text-gray-400 rounded-lg text-xs font-bold uppercase tracking-wider cursor-not-allowed">
-                                                            Absent
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                {{-- Leave Badge Only --}}
+                                                <span class="px-4 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold border border-amber-200 shadow-sm uppercase tracking-wider">
+                                                    LEAVE
+                                                </span>
                                             @else
                                                 {{-- Present/Absent Buttons --}}
                                                 @php

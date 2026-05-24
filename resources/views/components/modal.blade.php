@@ -28,7 +28,8 @@
 <!-- Modal Backdrop -->
 <div 
     id="{{ $id }}-backdrop"
-    class="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 {{ $show ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
+    class="fixed inset-0 z-50 transition-opacity duration-300 {{ $show ? 'opacity-100' : 'opacity-0 pointer-events-none' }}"
+    style="background-color: rgba(0, 0, 0, 0.45);"
     @if($backdropClose)
         onclick="closeModal('{{ $id }}')"
     @endif

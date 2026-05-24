@@ -112,6 +112,7 @@
             </li> -->
 
             <!-- Grades -->
+            {{--
             <li>
                 <a href="{{ route('student.grades') }}"
                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
@@ -124,6 +125,7 @@
                     <span class="font-medium">Grades</span>
                 </a>
             </li>
+            --}}
 
             <!-- Fees -->
             <li>
