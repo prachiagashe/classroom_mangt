@@ -436,6 +436,11 @@ class DashboardController extends Controller
      */
     public function getSubjectsByClass($className)
     {
+        // Normalize class name if needed (e.g., "6th" -> "6", "5th Class" -> "5")
+        if (preg_match('/^(\d+)/', $className, $matches)) {
+            $className = $matches[1];
+        }
+
         $subjects = Subject::where('class_name', $className)
             ->where('is_active', true)
             ->get(['id', 'name', 'code', 'teacher_name']);

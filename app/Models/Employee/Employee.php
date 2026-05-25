@@ -140,7 +140,34 @@ class Employee extends Model
      */
     public function getAssignedSubjectsArrayAttribute(): array
     {
-        return $this->assigned_subjects ? explode(', ', $this->assigned_subjects) : [];
+        if (!$this->assigned_subjects) return [];
+
+        $decoded = json_decode($this->assigned_subjects, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            // Flatten the mapping back to a single array of unique subjects for compatibility
+            $allSubjects = [];
+            foreach ($decoded as $class => $subjects) {
+                if (is_array($subjects)) {
+                    $allSubjects = array_merge($allSubjects, $subjects);
+                }
+            }
+            return array_values(array_unique($allSubjects));
+        }
+
+        return explode(', ', $this->assigned_subjects);
+    }
+
+    /**
+     * Get assigned subject mapping as array (Class -> Subjects)
+     */
+    public function getSubjectMappingAttribute(): array
+    {
+        if (!$this->assigned_subjects) return [];
+        $decoded = json_decode($this->assigned_subjects, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+        return [];
     }
 
     /**

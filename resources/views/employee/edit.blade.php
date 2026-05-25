@@ -254,12 +254,9 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                        <select name="payment_method" required class="w-full px-4 py-2.5 border @error('payment_method') border-red-500 @enderror border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            <option value="">Select Method</option>
-                            <option value="bank_transfer" {{ old('payment_method', $employee->payment_method) == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
-                            <option value="cash" {{ old('payment_method', $employee->payment_method) == 'cash' ? 'selected' : '' }}>Cash</option>
-                            <option value="upi" {{ old('payment_method', $employee->payment_method) == 'upi' ? 'selected' : '' }}>UPI</option>
-                        </select>
+                        <input type="text" readonly value="Bank Transfer"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed font-medium transition-all">
+                        <input type="hidden" name="payment_method" value="bank_transfer">
                         @error('payment_method')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -357,16 +354,17 @@
                     <!-- Assigned Classes -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Assigned Classes</label>
-                        <!-- Assigned Classes -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             @php
                                 $classesList = ['5th','6th','7th','8th','9th','10th','11th','12th'];
-                                $selectedClasses = old('assigned_classes', $employee->assigned_classes) ? explode(', ', old('assigned_classes', $employee->assigned_classes)) : [];
+                                $oldClasses = old('assigned_classes', $employee->assigned_classes);
+                                $selectedClasses = is_array($oldClasses) ? $oldClasses : ($oldClasses ? explode(', ', $oldClasses) : []);
                             @endphp
                             
                             @foreach($classesList as $class)
                                 <div class="class-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
-                                     onclick="toggleSelection(this, '{{$class}}', 'class')">
+                                     data-class="{{$class}}"
+                                     onclick="toggleAndLoadClass('{{$class}}')">
                                     <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                     <span>{{$class}} Class</span>
                                 </div>
@@ -374,7 +372,7 @@
                         </div>
                         
                         <!-- Hidden Checkboxes for Classes Submission -->
-                        <div class="hidden">
+                        <div class="hidden" id="hiddenClassesContainer">
                             @foreach($classesList as $class)
                                 <input type="checkbox" id="hidden_class_{{str_replace(' ', '_', $class)}}" name="assigned_classes[]" value="{{$class}}" @if(in_array($class, $selectedClasses)) checked @endif>
                             @endforeach
@@ -387,32 +385,40 @@
                     
                     <!-- Assigned Subjects -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Assigned Subjects</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            @php
-                                $subjectsList = ['Math', 'Science', 'English', 'Hindi', 'Social Studies', 'Computer Science', 'Physics', 'Chemistry', 'Biology'];
-                                $selectedSubjects = old('assigned_subjects', $employee->assigned_subjects) ? explode(', ', old('assigned_subjects', $employee->assigned_subjects)) : [];
-                            @endphp
-                            
-                            @foreach($subjectsList as $sub)
-                                <div class="subject-card flex items-center justify-center gap-2 p-3 rounded-xl border border-gray-300 bg-white text-gray-600 font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50"
-                                     onclick="toggleSelection(this, '{{$sub}}', 'subject')">
-                                    <svg class="w-4 h-4 hidden check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    <span>{{$sub}}</span>
-                                </div>
-                            @endforeach
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Assigned Subjects</label>
+                            <span id="activeClassLabel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hidden"></span>
                         </div>
                         
-                        <!-- Hidden Checkboxes for Subjects Submission -->
-                        <div class="hidden">
-                            @foreach($subjectsList as $sub)
-                                <input type="checkbox" id="hidden_subject_{{str_replace(' ', '_', $sub)}}" name="assigned_subjects[]" value="{{$sub}}" @if(in_array($sub, $selectedSubjects)) checked @endif>
-                            @endforeach
+                        <div id="subjectsLoading" class="hidden text-center py-4 text-gray-400">
+                            <svg class="animate-spin h-5 w-5 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-xs">Loading subjects...</span>
                         </div>
+                        
+                        <div id="subjectsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div class="col-span-full text-center py-6 text-sm text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
+                                Select a class to view subjects
+                            </div>
+                        </div>
+                        
+                        <!-- Single Hidden Input for Subjects JSON -->
+                        <input type="hidden" name="assigned_subjects" id="assigned_subjects_input" value="{{ old('assigned_subjects', $employee->assigned_subjects) }}">
+                        
                         @error('assigned_subjects')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                         <p class="text-xs text-gray-500 mt-2">Select all subjects this teacher will handle</p>
+                    </div>
+                </div>
+                
+                <!-- Mapping Preview Section -->
+                <div class="mt-8 border-t border-gray-100 pt-6">
+                    <h3 class="text-sm font-bold text-gray-900 mb-4">Teaching Assignments Preview</h3>
+                    <div id="mappingPreviewContainer" class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                        <div class="text-sm text-gray-500 italic text-center">No assignments selected yet.</div>
                     </div>
                 </div>
             </div>
@@ -435,70 +441,216 @@
 
 <script>
 let selectedClasses = [];
-let selectedSubjects = [];
+let classSubjectMap = {};
+let activeClass = null;
 
-function toggleSelection(cardElement, value, type) {
-    const isClass = type === 'class';
-    const arr = isClass ? selectedClasses : selectedSubjects;
-    const hiddenCheckboxId = isClass ? 'hidden_class_' + value.replace(/\s+/g, '_') : 'hidden_subject_' + value.replace(/\s+/g, '_');
+// Initialize mapping from old input if exists
+try {
+    const oldSubjectsJson = document.getElementById('assigned_subjects_input').value;
+    if (oldSubjectsJson && oldSubjectsJson.trim() !== '') {
+        classSubjectMap = JSON.parse(oldSubjectsJson);
+    }
+} catch (e) {
+    console.error("Error parsing old assigned_subjects JSON", e);
+}
+
+function updateMappingInput() {
+    document.getElementById('assigned_subjects_input').value = JSON.stringify(classSubjectMap);
+    renderMappingPreview();
+}
+
+function renderMappingPreview() {
+    const container = document.getElementById('mappingPreviewContainer');
+    let hasSelections = false;
+    let html = '<div class="space-y-3">';
+    
+    for (const [cls, subjects] of Object.entries(classSubjectMap)) {
+        if (subjects && subjects.length > 0) {
+            hasSelections = true;
+            html += `
+                <div class="flex items-start gap-3 p-3 bg-white border border-gray-100 rounded-lg shadow-sm">
+                    <div class="font-bold text-indigo-700 min-w-[80px]">${cls}</div>
+                    <div class="text-gray-400 mt-1">→</div>
+                    <div class="flex flex-wrap gap-2 flex-1">
+                        ${subjects.map(sub => `<span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-md border border-gray-200">${sub}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    html += '</div>';
+    
+    if (!hasSelections) {
+        container.innerHTML = '<div class="text-sm text-gray-500 italic text-center py-4">No assignments selected yet.</div>';
+    } else {
+        container.innerHTML = html;
+    }
+}
+
+function updateClassUI(className, isSelected, isActive) {
+    const cards = document.querySelectorAll('.class-card');
+    cards.forEach(card => {
+        if (card.dataset.class === className) {
+            const icon = card.querySelector('.check-icon');
+            
+            // Selection state
+            if (isSelected) {
+                card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                if (isActive) {
+                    card.classList.add('bg-indigo-100', 'border-indigo-500', 'text-indigo-700', 'shadow-sm', 'ring-2', 'ring-indigo-200');
+                } else {
+                    card.classList.remove('bg-indigo-100', 'border-indigo-500', 'text-indigo-700', 'ring-2', 'ring-indigo-200');
+                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
+                }
+                if (icon) icon.classList.remove('hidden');
+            } else {
+                card.classList.remove('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm', 'bg-indigo-100', 'border-indigo-500', 'text-indigo-700', 'ring-2', 'ring-indigo-200');
+                card.classList.add('bg-white', 'border-gray-300', 'text-gray-600');
+                if (icon) icon.classList.add('hidden');
+            }
+        } else {
+            // Remove active rings from other cards
+            card.classList.remove('ring-2', 'ring-indigo-200');
+            // Reapply normal selected colors if they were active
+            if (selectedClasses.includes(card.dataset.class)) {
+                card.classList.remove('bg-indigo-100', 'border-indigo-500', 'text-indigo-700');
+                card.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+            }
+        }
+    });
+}
+
+function toggleAndLoadClass(className) {
+    const hiddenCheckboxId = 'hidden_class_' + className.replace(/\s+/g, '_');
     const hiddenCheckbox = document.getElementById(hiddenCheckboxId);
     
-    const index = arr.indexOf(value);
+    const index = selectedClasses.indexOf(className);
+    
+    if (index !== -1 && activeClass === className) {
+        // Unselect if clicking the active one again
+        selectedClasses.splice(index, 1);
+        if (hiddenCheckbox) hiddenCheckbox.checked = false;
+        delete classSubjectMap[className];
+        updateMappingInput();
+        
+        activeClass = null;
+        updateClassUI(className, false, false);
+        
+        // Clear subjects
+        document.getElementById('activeClassLabel').classList.add('hidden');
+        document.getElementById('subjectsContainer').innerHTML = `<div class="col-span-full text-center py-6 text-sm text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">Select a class to view subjects</div>`;
+    } else {
+        // Select it and make it active
+        if (index === -1) {
+            selectedClasses.push(className);
+            if (hiddenCheckbox) hiddenCheckbox.checked = true;
+            if (!classSubjectMap[className]) {
+                classSubjectMap[className] = [];
+            }
+        }
+        
+        activeClass = className;
+        
+        // Update UI for all classes to reflect the new active one
+        selectedClasses.forEach(cls => {
+            updateClassUI(cls, true, cls === activeClass);
+        });
+        
+        loadSubjectsForClass(className);
+    }
+}
+
+function loadSubjectsForClass(className) {
+    document.getElementById('subjectsContainer').innerHTML = '';
+    document.getElementById('subjectsLoading').classList.remove('hidden');
+    document.getElementById('activeClassLabel').textContent = className + ' Subjects';
+    document.getElementById('activeClassLabel').classList.remove('hidden');
+    
+    fetch(`/api/subjects/${className}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('subjectsLoading').classList.add('hidden');
+            const container = document.getElementById('subjectsContainer');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-sm text-red-400 border-2 border-dashed border-red-100 rounded-xl bg-red-50">No subjects found for ${className}</div>`;
+                return;
+            }
+            
+            const selectedForClass = classSubjectMap[className] || [];
+            
+            data.forEach(sub => {
+                const isSelected = selectedForClass.includes(sub.name);
+                const bgClass = isSelected ? 'bg-green-100 border-green-500 text-green-700 shadow-sm' : 'bg-white border-gray-300 text-gray-600';
+                const iconHidden = isSelected ? '' : 'hidden';
+                
+                const card = document.createElement('div');
+                card.className = `subject-card flex items-center justify-center gap-2 p-3 rounded-xl border font-bold text-sm transition-all duration-200 cursor-pointer hover:bg-gray-50 ${bgClass}`;
+                card.onclick = () => toggleSubject(card, className, sub.name);
+                
+                card.innerHTML = `
+                    <svg class="w-4 h-4 ${iconHidden} check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    <span>${sub.name}</span>
+                `;
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('subjectsLoading').classList.add('hidden');
+            document.getElementById('subjectsContainer').innerHTML = `<div class="col-span-full text-center py-6 text-sm text-red-400 border-2 border-dashed border-red-100 rounded-xl bg-red-50">Error loading subjects</div>`;
+        });
+}
+
+function toggleSubject(cardElement, className, subjectName) {
+    if (!classSubjectMap[className]) {
+        classSubjectMap[className] = [];
+    }
+    
+    const arr = classSubjectMap[className];
+    const index = arr.indexOf(subjectName);
     
     if (index !== -1) {
-        // It was selected, now deselect it
+        // Deselect
         arr.splice(index, 1);
-        if (hiddenCheckbox) hiddenCheckbox.checked = false;
-        
-        // Update UI
         cardElement.classList.remove('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
         cardElement.classList.add('bg-white', 'border-gray-300', 'text-gray-600');
         const icon = cardElement.querySelector('.check-icon');
         if(icon) icon.classList.add('hidden');
     } else {
-        // It was not selected, now select it
-        arr.push(value);
-        if (hiddenCheckbox) hiddenCheckbox.checked = true;
-        
-        // Update UI
+        // Select
+        arr.push(subjectName);
         cardElement.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
         cardElement.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
         const icon = cardElement.querySelector('.check-icon');
         if(icon) icon.classList.remove('hidden');
     }
+    
+    updateMappingInput();
 }
 
 function initSelections() {
-    // Initialize from hidden checkboxes which hold the 'old' values
+    // Initialize selected classes
     document.querySelectorAll('input[id^="hidden_class_"]').forEach(cb => {
         if (cb.checked) {
             selectedClasses.push(cb.value);
-            // find corresponding card and activate
-            document.querySelectorAll('.class-card').forEach(card => {
-                if (card.innerText.trim() === cb.value.trim() + ' Class') {
-                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
-                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
-                    const icon = card.querySelector('.check-icon');
-                    if(icon) icon.classList.remove('hidden');
-                }
-            });
+            updateClassUI(cb.value, true, false);
+            
+            if (!classSubjectMap[cb.value]) {
+                classSubjectMap[cb.value] = [];
+            }
         }
     });
     
-    document.querySelectorAll('input[id^="hidden_subject_"]').forEach(cb => {
-        if (cb.checked) {
-            selectedSubjects.push(cb.value);
-            // find corresponding card and activate
-            document.querySelectorAll('.subject-card').forEach(card => {
-                if (card.innerText.trim() === cb.value.trim()) {
-                    card.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
-                    card.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'shadow-sm');
-                    const icon = card.querySelector('.check-icon');
-                    if(icon) icon.classList.remove('hidden');
-                }
-            });
-        }
-    });
+    // Select the first class by default if any exist
+    if (selectedClasses.length > 0) {
+        activeClass = selectedClasses[0];
+        updateClassUI(activeClass, true, true);
+        loadSubjectsForClass(activeClass);
+    }
+    
+    updateMappingInput();
 }
 
 // Disable all form fields when validation errors are present

@@ -172,7 +172,19 @@
                                                     </div>
                                                 @endif
                                                 
-                                                @if($employee->assigned_subjects_array)
+                                                @if(!empty($employee->subject_mapping))
+                                                    <div class="mt-2">
+                                                        <span class="text-xs text-gray-600">Subjects Mapping:</span>
+                                                        <div class="flex flex-col gap-1 mt-1">
+                                                            @foreach($employee->subject_mapping as $cls => $subs)
+                                                                <div class="text-xs">
+                                                                    <span class="font-medium text-purple-700">{{ $cls }}</span> &rarr; 
+                                                                    <span class="text-blue-600">{{ implode(', ', $subs) }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @elseif($employee->assigned_subjects_array)
                                                     <div>
                                                         <span class="text-xs text-gray-600">Subjects:</span>
                                                         <div class="flex flex-wrap gap-1 mt-1">
@@ -230,9 +242,22 @@
                                 @endif
                             </td>
                             <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold text-green-700">
-                                {{ $employee->assigned_subjects }}
-                                </span>
+                                @php
+                                    $mapping = $employee->subject_mapping;
+                                @endphp
+                                @if(!empty($mapping))
+                                    <div class="flex flex-col gap-1">
+                                        @foreach($mapping as $cls => $subs)
+                                            <div class="text-xs text-green-700 whitespace-nowrap">
+                                                <span class="font-bold">{{ $cls }}</span> &rarr; {{ implode(', ', $subs) }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-semibold text-green-700">
+                                        {{ $employee->assigned_subjects ?: 'N/A' }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="p-4">
                                 <div class="flex gap-2">

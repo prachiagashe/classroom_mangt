@@ -89,13 +89,13 @@
                 @endif
 
                 <!-- User Info -->
-                <div class="text-left">
+                <div class="text-left max-w-[120px] sm:max-w-[150px]">
                     <!-- Name -->
-                    <span class="text-gray-700 font-medium block">
+                    <span class="text-gray-700 font-medium block overflow-hidden text-ellipsis whitespace-nowrap" title="{{ Auth::user()->name }}">
                         {{ Auth::user()->name }}
                     </span>
                     <!-- Role -->
-                    <div class="text-xs text-gray-500">
+                    <div class="text-xs text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
                         @if(Auth::user()->role === 'admin')
                             Administrator
                         @elseif(Auth::user()->role === 'teacher')
@@ -109,7 +109,7 @@
                 </div>
                 
                 <!-- Arrow -->
-                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 9l-7 7-7-7"/>
                 </svg>
@@ -117,13 +117,13 @@
 
             <!-- Dropdown -->
             <div id="userDropdown"
-                 class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-lg z-50">
+                 class="hidden absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg z-50">
 
                 <div class="px-4 py-3 border-b">
-                    <p class="font-semibold text-gray-800">
+                    <p class="font-semibold text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap" title="{{ Auth::user()->name }}">
                         {{ Auth::user()->name }}
                     </p>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" title="{{ Auth::user()->email }}">
                         {{ Auth::user()->email }}
                     </p>
                 </div>

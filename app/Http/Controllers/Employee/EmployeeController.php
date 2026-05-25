@@ -96,9 +96,9 @@ class EmployeeController extends Controller
             'payment_method' => 'required|in:bank_transfer,cash,upi',
             
             // Bank Details Validation
-            'bank_name' => 'required_if:payment_method,bank_transfer|nullable|string|max:255|regex:/^[A-Za-z\s]+$/',
-            'account_number' => 'required_if:payment_method,bank_transfer|nullable|digits_between:9,18',
-            'IFSC_code' => 'required_if:payment_method,bank_transfer|nullable|string|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/|max:11',
+            'bank_name' => 'required|string|max:100|regex:/^[A-Za-z\s]+$/',
+            'account_number' => 'required|digits_between:9,18',
+            'IFSC_code' => 'required|string|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/|max:11',
             
             // Education Details Validation
             'education_degree.*' => 'required|string|max:100|regex:/^[A-Za-z\s]+$/',
@@ -119,8 +119,7 @@ class EmployeeController extends Controller
             // Academic Assignment Validation
             'assigned_classes' => 'required_if:designation,teacher,Teacher|nullable|array|min:1',
             'assigned_classes.*' => 'nullable|string|max:50',
-            'assigned_subjects' => 'required_if:designation,teacher,Teacher|nullable|array|min:1',
-            'assigned_subjects.*' => 'nullable|string|max:50',
+            'assigned_subjects' => 'required_if:designation,teacher,Teacher|nullable|string',
         ], [
             // Personal Information Error Messages
             'first_name.required' => 'First name is required.',
@@ -156,11 +155,11 @@ class EmployeeController extends Controller
             'payment_method.required' => 'Payment method is required.',
             
             // Bank Details Error Messages
-            'bank_name.required_if' => 'Bank name is required for bank transfer.',
+            'bank_name.required' => 'Bank name is required.',
             'bank_name.regex' => 'Bank name can only contain alphabets and spaces.',
-            'account_number.required_if' => 'Account number is required for bank transfer.',
+            'account_number.required' => 'Account number is required.',
             'account_number.digits_between' => 'Account number must be between 9 and 18 digits.',
-            'IFSC_code.required_if' => 'IFSC code is required for bank transfer.',
+            'IFSC_code.required' => 'IFSC code is required.',
             'IFSC_code.regex' => 'Please enter a valid IFSC code (e.g. SBIN0001234).',
             'IFSC_code.max' => 'IFSC code must be exactly 11 characters.',
             
@@ -267,7 +266,7 @@ class EmployeeController extends Controller
                 'account_number' => $request->account_number,
                 'IFSC_code' => $request->IFSC_code,
                 'assigned_classes' => $request->has('assigned_classes') ? implode(', ', $request->assigned_classes) : null,
-                'assigned_subjects' => $request->has('assigned_subjects') ? implode(', ', $request->assigned_subjects) : null,
+                'assigned_subjects' => $request->has('assigned_subjects') ? $request->assigned_subjects : null,
                 'education' => !empty($educationEntries) ? Employee::formatEducation($educationEntries) : null,
                 'experience' => !empty($experienceEntries) ? Employee::formatExperience($experienceEntries) : null,
             ]);
@@ -331,10 +330,10 @@ class EmployeeController extends Controller
             'basic_salary' => 'required|numeric|min:0',
             'salary_type' => 'required|in:monthly,hourly,yearly',
             'payment_method' => 'required|in:bank_transfer,cash,upi',
-            // Conditional bank details validation
-            'bank_name' => 'required_if:payment_method,bank_transfer|string|max:255',
-            'account_number' => 'required_if:payment_method,bank_transfer|string|regex:/^[0-9]{9,18}$/',
-            'IFSC_code' => 'required_if:payment_method,bank_transfer|string|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/|max:11',
+            // Conditional bank details validation (now strictly required)
+            'bank_name' => 'required|string|max:255',
+            'account_number' => 'required|string|regex:/^[0-9]{9,18}$/',
+            'IFSC_code' => 'required|string|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/|max:11',
             
             // Education validation
             'education_degree.*' => 'nullable|string|max:255',
@@ -355,13 +354,15 @@ class EmployeeController extends Controller
             // Academic assignment validation
             'assigned_classes' => 'nullable|array|min:1',
             'assigned_classes.*' => 'nullable|string|max:50',
-            'assigned_subjects' => 'nullable|array|min:1',
-            'assigned_subjects.*' => 'nullable|string|max:50',
+            'assigned_subjects' => 'nullable|string',
         ], [
             'phone.required' => 'Mobile number is required.',
             'phone.regex' => 'Mobile number must be exactly 10 digits.',
             'phone.max' => 'Mobile number must be exactly 10 digits.',
+            'bank_name.required' => 'Bank name is required.',
+            'account_number.required' => 'Account number is required.',
             'account_number.regex' => 'Account number must be between 9 and 18 digits.',
+            'IFSC_code.required' => 'IFSC code is required.',
             'IFSC_code.regex' => 'Please enter a valid IFSC code.',
             'IFSC_code.max' => 'IFSC code must be exactly 11 characters.',
         ]);
@@ -441,7 +442,7 @@ class EmployeeController extends Controller
                 'account_number' => $request->account_number,
                 'IFSC_code' => $request->IFSC_code,
                 'assigned_classes' => $request->has('assigned_classes') ? implode(', ', $request->assigned_classes) : null,
-                'assigned_subjects' => $request->has('assigned_subjects') ? implode(', ', $request->assigned_subjects) : null,
+                'assigned_subjects' => $request->has('assigned_subjects') ? $request->assigned_subjects : null,
                 'education' => !empty($educationEntries) ? Employee::formatEducation($educationEntries) : null,
                 'experience' => !empty($experienceEntries) ? Employee::formatExperience($experienceEntries) : null,
             ]);
