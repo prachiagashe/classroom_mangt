@@ -48,4 +48,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
 }

@@ -189,15 +189,13 @@
     </nav>
 
     <!-- User Info Footer -->
-    <div class="border-t border-purple-400 p-4">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-purple-600 font-bold">
-                {{ substr(Auth::user()->name, 0, 1) }}
-            </div>
-            <div class="flex-1">
-                <div class="font-semibold text-white text-sm">{{ Auth::user()->name }}</div>
-                <div class="text-purple-200 text-xs">Student ID: #{{ str_pad(Auth::user()->id, 4, '0', STR_PAD_LEFT) }}</div>
-            </div>
+    <div class="p-4 border-t border-purple-800 bg-purple-950 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-purple-700 text-white flex items-center justify-center font-bold flex-shrink-0">
+            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="font-semibold text-white text-sm truncate" title="{{ Auth::user()->name }}">{{ Auth::user()->name }}</div>
+            <div class="text-purple-200 text-xs truncate">Student ID: #{{ str_pad(Auth::user()->id, 4, '0', STR_PAD_LEFT) }}</div>
         </div>
     </div>
 

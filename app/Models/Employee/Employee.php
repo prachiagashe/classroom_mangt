@@ -43,6 +43,21 @@ class Employee extends Model
         'experience' => 'string',
     ];
 
+    public function getFirstNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
+    public function getMiddleNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
+    public function getLastNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
     /**
      * Get the full name of the employee.
      */

@@ -51,4 +51,9 @@ class StudentAttendence extends Model
         
         $this->save();
     }
+
+    public function getNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
 }

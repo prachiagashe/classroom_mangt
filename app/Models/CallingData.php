@@ -28,4 +28,9 @@ class CallingData extends Model
         'follow_up' => 'boolean',
         'follow_up_date' => 'datetime',
     ];
+
+    public function getStudentNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
 }

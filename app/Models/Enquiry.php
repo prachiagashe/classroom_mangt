@@ -102,5 +102,18 @@ class Enquiry extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function getFirstNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
 
+    public function getMiddleNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
+    public function getSurnameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
 }

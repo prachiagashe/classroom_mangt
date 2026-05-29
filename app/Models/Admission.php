@@ -78,6 +78,16 @@ class Admission extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function getStudentNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
+    public function getParentNameAttribute($value)
+    {
+        return $value ? ucwords(strtolower($value)) : $value;
+    }
+
     // Automatically calculate balance
     public function getBalanceAttribute()
     {

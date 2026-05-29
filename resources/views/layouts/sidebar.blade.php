@@ -184,13 +184,13 @@
     <div class="border-t border-gray-700 p-3">
 
         <div class="flex items-center gap-3 mb-3">
-            <div class="bg-blue-600 rounded-full text-white flex items-center justify-center"
+            <div class="bg-blue-600 rounded-full text-white flex items-center justify-center flex-shrink-0 font-bold"
                  style="width:40px;height:40px;">
-                AU
+                {{ strtoupper(substr(Auth::user()->name ?? 'AU', 0, 2)) }}
             </div>
-            <div>
-                <div class="font-semibold">Admin User</div>
-                <small class="text-gray-400">Administrator</small>
+            <div class="min-w-0 flex-1">
+                <div class="font-semibold text-white truncate" title="{{ Auth::user()->name ?? 'Admin User' }}">{{ Auth::user()->name ?? 'Admin User' }}</div>
+                <small class="text-gray-400 block truncate">Administrator</small>
             </div>
         </div>
 <form method="POST" action="{{ route('logout') }}">

@@ -92,13 +92,13 @@
     <div class="border-t border-gray-700 p-3">
 
         <div class="flex items-center gap-3 mb-3">
-            <div class="bg-blue-600 rounded-full text-white flex items-center justify-center"
+            <div class="bg-blue-600 rounded-full text-white flex items-center justify-center flex-shrink-0 font-bold"
                  style="width:40px;height:40px;">
-                {{ substr(Auth::user()->name, 0, 2) }}
+                {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
             </div>
-            <div>
-                <div class="font-semibold">{{ Auth::user()->name }}</div>
-                <small class="text-gray-400">Teacher</small>
+            <div class="min-w-0 flex-1">
+                <div class="font-semibold text-white truncate" title="{{ Auth::user()->name }}">{{ Auth::user()->name }}</div>
+                <small class="text-gray-400 block truncate">Teacher</small>
             </div>
         </div>
 
