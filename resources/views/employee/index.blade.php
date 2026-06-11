@@ -32,7 +32,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">Total Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $employees->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalCount }}</p>
                 </div>
                 <div class="bg-blue-100 p-3 rounded-lg">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">Active</p>
-                    <p class="text-2xl font-bold text-green-600">{{ $employees->where('status', 'Active')->count() }}</p>
+                    <p class="text-2xl font-bold text-green-600">{{ $activeCount }}</p>
                 </div>
                 <div class="bg-green-100 p-3 rounded-lg">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600">On Leave</p>
-                    <p class="text-2xl font-bold text-yellow-600">{{ $employees->where('status', 'On Leave')->count() }}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ $onLeaveCount }}</p>
                 </div>
                 <div class="bg-yellow-100 p-3 rounded-lg">
                     <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,22 +308,11 @@
         </div>
 
         <!-- Pagination -->
-        <div class="p-4 border-t border-gray-200 flex items-center justify-between">
-            <div class="text-sm text-gray-600">
-                Showing 1 to 3 of 24 results
+        @if($employees->hasPages())
+            <div class="p-4 border-t border-gray-200">
+                {{ $employees->links() }}
             </div>
-            <div class="flex gap-2">
-                <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">
-                    Previous
-                </button>
-                <button class="px-3 py-1 bg-blue-600 text-white rounded">1</button>
-                <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">2</button>
-                <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">3</button>
-                <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition">
-                    Next
-                </button>
-            </div>
-        </div>
+        @endif
     </div>
 </div>
 

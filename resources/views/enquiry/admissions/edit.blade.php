@@ -485,6 +485,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (totalFeesInput) totalFeesInput.addEventListener('input', calculateFinalFees);
     if (discountFeesInput) discountFeesInput.addEventListener('input', calculateFinalFees);
     if (numberOfInstallmentsInput) numberOfInstallmentsInput.addEventListener('input', calculateInstallmentAmount);
+
+    // Auto-dismiss inline alerts after 5 seconds
+    const inlineAlerts = document.querySelectorAll('[role="alert"]');
+    inlineAlerts.forEach(alert => {
+        if (alert.id === 'global-toast') return;
+        setTimeout(() => {
+            alert.style.transition = 'all 0.5s ease-out';
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-10px)';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
 });
 </script>
 

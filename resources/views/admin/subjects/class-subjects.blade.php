@@ -64,6 +64,7 @@
                             {{ $subjects->where('program_type', 'Regular')->count() }}
                         </span>
                     </button>
+                    {{--
                     <button onclick="filterSubjects('NEET')" 
                             class="filter-btn px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gray-200 text-gray-700 hover:bg-gray-300"
                             data-filter="NEET">
@@ -96,6 +97,7 @@
                             {{ $subjects->where('program_type', 'Crash Course')->count() }}
                         </span>
                     </button>
+                    --}}
                 </div>
             </div>
         </div>
@@ -194,11 +196,6 @@
                                                        ($subject->course_name == 'JEE' ? 'bg-blue-100 text-blue-700' : 
                                                        ($subject->course_name == 'MHT-CET' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700')) }}">
                                                     {{ $subject->course_name ?: 'REGULAR' }}
-                                                </span>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium
-                                                    {{ $subject->program_type == 'Repeater' ? 'bg-orange-100 text-orange-800' : 
-                                                       ($subject->program_type == 'Crash Course' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800') }}">
-                                                    {{ $subject->program_type ?: 'Regular' }}
                                                 </span>
                                             </div>
                                         </td>

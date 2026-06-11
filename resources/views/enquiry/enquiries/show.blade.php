@@ -75,11 +75,19 @@
                             <p class="text-gray-900 font-medium view-mode">{{ $enquiry->formatted_class }}</p>
                             <div class="edit-mode hidden mt-1">
                                 <select name="class" class="border rounded px-2 py-1 text-sm w-full">
-                                    @foreach([
-                                        1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th',
-                                        6 => '6th', 7 => '7th', 8 => '8th', 9 => '9th', 10 => '10th',
-                                        11 => '11th', 12 => '12th'
-                                    ] as $val => $label)
+                                    @php
+                                        $classOptions = [
+                                            5 => '5th', 6 => '6th', 7 => '7th', 8 => '8th', 
+                                            9 => '9th', 10 => '10th', 11 => '11th', 12 => '12th'
+                                        ];
+                                        $currentClass = $enquiry->class ?? null;
+                                        if ($currentClass && in_array($currentClass, [1, 2, 3, 4])) {
+                                            $legacyOptions = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th'];
+                                            $classOptions[$currentClass] = $legacyOptions[$currentClass];
+                                            ksort($classOptions);
+                                        }
+                                    @endphp
+                                    @foreach($classOptions as $val => $label)
                                         <option value="{{ $val }}" {{ old('class', $enquiry->class) == $val ? 'selected' : '' }}>{{ $label }} Class</option>
                                     @endforeach
                                 </select>

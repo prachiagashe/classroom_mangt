@@ -94,41 +94,45 @@
                 <tbody>
                     @forelse($employeesWithSalary as $employeeData)
                         <tr class="border-b border-gray-100 hover:bg-gray-50">
-                            <td class="p-4">
-                                <a href="{{ route('salary.history', $employeeData['employee']->employee_code) }}" 
-                                   class="font-medium text-gray-900 hover:text-blue-800 transition-colors">
-                                    {{ $employeeData['employee']->full_name }}
-                                </a>
-                                <div class="text-sm text-gray-500">{{ $employeeData['employee']->email }}</div>
+                            <td class="p-4 whitespace-nowrap">
+                                <div class="max-w-[200px] truncate" title="{{ $employeeData['employee']->full_name }}">
+                                    <a href="{{ route('salary.history', $employeeData['employee']->employee_code) }}" 
+                                       class="font-medium text-gray-900 hover:text-blue-800 transition-colors">
+                                        {{ $employeeData['employee']->full_name }}
+                                    </a>
+                                </div>
+                                <div class="text-sm text-gray-500 max-w-[200px] truncate" title="{{ $employeeData['employee']->email }}">
+                                    {{ $employeeData['employee']->email }}
+                                </div>
                             </td>
-                            <td class="p-4 font-mono text-sm text-gray-900">
+                            <td class="p-4 font-mono text-sm text-gray-900 whitespace-nowrap">
                                 <a href="{{ route('salary.history', $employeeData['employee']->employee_code) }}" 
                                    class="text-gray-900 hover:text-blue-900 transition-colors">
                                     #{{ $employeeData['employee']->employee_code }}
                                 </a>
                             </td>
-                            <td class="p-4 text-gray-900">
+                            <td class="p-4 text-gray-900 whitespace-nowrap">
                                 @if($employeeData['salary_record'])
                                     ₹{{ number_format($employeeData['salary_record']->basic_salary, 2) }}
                                 @else
                                     ₹{{ number_format($employeeData['employee']->basic_salary, 2) }}
                                 @endif
                             </td>
-                            <td class="p-4 text-gray-900">
+                            <td class="p-4 text-gray-900 whitespace-nowrap">
                                 @if($employeeData['salary_record'])
                                     ₹{{ number_format($employeeData['salary_record']->net_salary, 2) }}
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="p-4 text-gray-900">
+                            <td class="p-4 text-gray-900 whitespace-nowrap">
                                 @if($employeeData['salary_record'])
                                     ₹{{ number_format($employeeData['salary_record']->paid_amount, 2) }}
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="p-4">
+                            <td class="p-4 whitespace-nowrap">
                                 @switch($employeeData['status'])
                                     @case('not_generated')
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -150,34 +154,37 @@
                                             Paid
                                         </span>
                                         @break
-                                @endswitch
+                                    @endswitch
                             </td>
-                            <td class="p-4 text-gray-900">
+                            <td class="p-4 text-gray-900 whitespace-nowrap">
                                 @if($employeeData['salary_record'] && $employeeData['salary_record']->payment_date)
                                     {{ date('d M Y', strtotime($employeeData['salary_record']->payment_date)) }}
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="p-4">
+                            <td class="p-4 whitespace-nowrap">
                                 @if($employeeData['status'] == 'not_generated')
                                     <form method="POST" action="{{ route('salary.generate') }}" class="inline">
                                         @csrf
                                         <input type="hidden" name="month" value="{{ $selectedMonth }}">
                                         <input type="hidden" name="year" value="{{ $selectedYear }}">
                                         <button type="submit" 
-                                                class="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+                                                class="inline-flex items-center bg-green-600 text-white font-medium hover:bg-green-700 transition-colors shadow-sm hover:shadow-md"
+                                                style="padding: 8px 14px; font-size: 14px; min-width: auto; border-radius: 8px;">
                                             Generate Salary
                                         </button>
                                     </form>
                                 @else
                                     <div class="flex gap-2">
                                         <a href="{{ route('salary.pay', $employeeData['salary_record']->id) }}" 
-                                           class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                                           class="inline-flex items-center bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+                                           style="padding: 8px 14px; font-size: 14px; min-width: auto; border-radius: 8px;">
                                             Pay Salary
                                         </a>
                                         <a href="{{ route('salary.history', $employeeData['employee']->employee_code) }}" 
-                                           class="inline-flex items-center px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors">
+                                           class="inline-flex items-center bg-gray-600 text-white font-medium hover:bg-gray-700 transition-colors shadow-sm hover:shadow-md"
+                                           style="padding: 8px 14px; font-size: 14px; min-width: auto; border-radius: 8px;">
                                             View History
                                         </a>
                                     </div>

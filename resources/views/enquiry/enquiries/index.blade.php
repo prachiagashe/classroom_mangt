@@ -581,17 +581,36 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(data => {
             if (data.success) {
-                alert(data.message);
                 closeFollowUpModal();
-
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        document.querySelector('.swal2-container').style.zIndex = '10000';
+                    }
+                }).then(() => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to schedule follow-up'
+                });
             }
         })
         .catch(error => {
             console.error(error);
-            alert(error.message || 'Something went wrong while saving follow up');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Something went wrong while saving follow up'
+            });
         });
     });
 

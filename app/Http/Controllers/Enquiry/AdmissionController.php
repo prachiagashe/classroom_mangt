@@ -99,7 +99,7 @@ class AdmissionController extends Controller
             ->paginate(10, ['*'], 'enquiries_page');
 
         // Predefined classes logic
-        $classes = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
+        $classes = ['5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
         
         // Get classes with student counts for the view (we'll just use the old grouping, it's commented out in view anyway)
         $classesWithCounts = Admission::select('class', DB::raw('count(*) as student_count'))

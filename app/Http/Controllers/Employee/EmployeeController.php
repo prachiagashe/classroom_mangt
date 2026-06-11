@@ -52,8 +52,13 @@ class EmployeeController extends Controller
             $query->where('status', $status);
         }
         
-        $employees = $query->get();
-        return view('employee.index', compact('employees'));
+        // Calculate counts before paginating
+        $totalCount = $query->count();
+        $activeCount = (clone $query)->where('status', 'Active')->count();
+        $onLeaveCount = (clone $query)->where('status', 'On Leave')->count();
+        
+        $employees = $query->paginate(10)->withQueryString();
+        return view('employee.index', compact('employees', 'totalCount', 'activeCount', 'onLeaveCount'));
     }
 
     /**

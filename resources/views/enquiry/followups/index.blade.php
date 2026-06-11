@@ -192,6 +192,7 @@
                         <!-- ACTIONS -->
                         <div class="flex flex-col gap-3 w-36">
 
+                            <div style="display: none;">
                             <form method="POST"
                                   action="{{ route('enquiry.followups.markContacted', $followUp->id) }}"
                                   onsubmit="handleMarkContacted(event, {{ $followUp->id }})">
@@ -200,6 +201,7 @@
                                     Mark Contacted
                                 </button>
                             </form>
+                            </div>
 
                             <button onclick="showNoteModalSimple({{ $followUp->id }})"
                                     class="border px-3 py-2 rounded-xl text-sm hover:bg-gray-50 w-full">
@@ -233,8 +235,6 @@
         </div>
 
     </div>
-
-@endsection
 
 <!-- Confirmation Modal -->
 <x-modal id="confirmModal" title="Confirm Admission" :show="false" maxWidth="md">
@@ -533,17 +533,37 @@ function saveNoteSimple() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Note saved successfully!');
+            // Close modal first
             hideModal('noteModalSimple');
             document.getElementById('noteTextSimple').value = '';
-            location.reload(); // Refresh UI to show updated data
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Note saved successfully!',
+                timer: 1500,
+                showConfirmButton: false,
+                didOpen: () => {
+                    document.querySelector('.swal2-container').style.zIndex = '10000';
+                }
+            }).then(() => {
+                location.reload();
+            });
         } else {
-            alert('Error: ' + (data.message || 'Failed to save note'));
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to save note'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error: Failed to save note');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to save note'
+        });
     });
 }
 
@@ -552,12 +572,12 @@ function saveRescheduleSimple() {
     const time = document.getElementById('rescheduleTimeSimple').value;
     
     if (!date || !time) {
-        alert('Please select both date and time');
+        Swal.fire('Please select both date and time');
         return;
     }
     
     if (!currentFollowUpId) {
-        alert('Error: No follow-up selected');
+        Swal.fire('Error: No follow-up selected');
         return;
     }
     
@@ -573,24 +593,44 @@ function saveRescheduleSimple() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Follow-up rescheduled successfully!');
+            // Close modal first
             hideModal('rescheduleModalSimple');
             document.getElementById('rescheduleDateSimple').value = '';
             document.getElementById('rescheduleTimeSimple').value = '';
-            location.reload(); // Refresh UI to show updated data
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Follow-up rescheduled successfully!',
+                timer: 1500,
+                showConfirmButton: false,
+                didOpen: () => {
+                    document.querySelector('.swal2-container').style.zIndex = '10000';
+                }
+            }).then(() => {
+                location.reload();
+            });
         } else {
-            alert('Error: ' + (data.message || 'Failed to reschedule'));
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to reschedule'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error: Failed to reschedule');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to reschedule'
+        });
     });
 }
 
 function confirmAdmissionSimple() {
     if (!currentFollowUpId) {
-        alert('Error: No follow-up selected');
+        Swal.fire('Error: No follow-up selected');
         return;
     }
 
@@ -621,11 +661,27 @@ function confirmAdmissionSimple() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Admission confirmed successfully! Roll No: ' + (data.roll_number || ''));
+            // Close modal first
             hideModal('confirmModalSimple');
-            location.reload(); // Refresh UI to show updated data
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Admission confirmed successfully! Roll No: ' + (data.roll_number || ''),
+                timer: 2000,
+                showConfirmButton: false,
+                didOpen: () => {
+                    document.querySelector('.swal2-container').style.zIndex = '10000';
+                }
+            }).then(() => {
+                location.reload();
+            });
         } else {
-            alert('Error: ' + (data.message || 'Failed to confirm admission'));
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to confirm admission'
+            });
             // Re-enable
             if (btnConfirm) {
                 btnConfirm.disabled = false;
@@ -1064,3 +1120,5 @@ function generateCalendar(month, year) {
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', initCalendar);
 </script>
+
+@endsection
