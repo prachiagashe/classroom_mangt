@@ -172,13 +172,8 @@ class EnquiryFormController extends Controller
             // WhatsApp Auto-Reply
             app(\App\Services\WhatsAppService::class)->sendMessage('new_enquiry', $enquiry);
 
-            if (auth()->check()) {
-                return redirect()->route('admin.enquiry.form')
-                                 ->with('success', 'Enquiry Saved Successfully!');
-            }
-
-            return redirect()->route('login')
-                             ->with('enquiry_success', 'Enquiry submitted successfully!');
+            session()->flash('success', 'Enquiry added successfully.');
+            return redirect()->back();
         } catch (\Exception $e) {
             \Log::error('Error saving enquiry:', ['error' => $e->getMessage()]);
             return redirect()->back()

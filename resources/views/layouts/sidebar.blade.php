@@ -81,6 +81,19 @@
             </a>
         </li>
 
+       
+        <li>
+            <a href="{{ route('enquiry.fees') }}" 
+               class="flex items-center gap-3 px-3 py-2 rounded transition {{ request()->routeIs('enquiry.fees*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2"/>
+                    <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Fees Management
+            </a>
+        </li>
+
+
         <li>
             <a href="{{ route('admin.attendance.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded transition {{ request()->routeIs('admin.attendance.*')
@@ -90,17 +103,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Attendance Management
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ route('enquiry.fees') }}" 
-               class="flex items-center gap-3 px-3 py-2 rounded transition {{ request()->routeIs('enquiry.fees*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <rect x="1" y="4" width="22" height="16" rx="2"/>
-                    <line x1="1" y1="10" x2="23" y2="10"/>
-                </svg>
-                Fees Management
             </a>
         </li>
 
@@ -157,7 +159,7 @@
         
         <li>
             <a href="{{ route('enquiry.reports') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded transition {{ request()->routeIs('enquiry.reports.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
+               class="flex items-center gap-3 px-3 py-2 rounded transition {{ request()->routeIs('enquiry.reports*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                 </svg>

@@ -226,7 +226,7 @@
                                                     Edit
                                                 </a>
                                                 <form action="{{ route('admin.subjects.destroy', $subject->id) }}" method="POST" 
-                                                      onsubmit="return confirm('Are you sure you want to delete this subject?')">
+                                                      onsubmit="confirmDeleteSubject(event, this)">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">
@@ -886,12 +886,19 @@ document.addEventListener('DOMContentLoaded', function() {
 function publishTimetable() {
     const className = '{{ $className }}';
     
-    if (!confirm(`Are you sure you want to publish the timetable for Class ${className}? This will make it visible to all students.`)) {
-        return;
-    }
-    
-    fetch('/admin/subjects/publish-timetable', {
-        method: 'POST',
+    Swal.fire({
+        title: `Publish timetable for Class ${className}?`,
+        text: 'This will make it visible to all students.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Publish',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/admin/subjects/publish-timetable', {
+                method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '{{ csrf_token() }}'
@@ -961,18 +968,27 @@ function publishTimetable() {
             errorDiv.remove();
         }, 3000);
     });
+        }
+    });
 }
 
 // Function to publish subjects
 function publishSubjects() {
     const className = '{{ $className }}';
     
-    if (!confirm(`Are you sure you want to publish the subjects for Class ${className}? This will notify all students.`)) {
-        return;
-    }
-    
-    fetch('/admin/subjects/publish-subjects', {
-        method: 'POST',
+    Swal.fire({
+        title: `Publish subjects for Class ${className}?`,
+        text: 'This will notify all students.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Publish',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/admin/subjects/publish-subjects', {
+                method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '{{ csrf_token() }}'
@@ -1008,6 +1024,8 @@ function publishSubjects() {
     .catch(error => {
         console.error('Error publishing subjects:', error);
         alert('An error occurred. Please try again.');
+    });
+        }
     });
 }
 
@@ -1246,5 +1264,25 @@ function closeDoubtSessionModal() {
     document.getElementById('description').value = '';
     document.querySelector('input[name="status"][value="draft"]').checked = true;
 }
+
+// SweetAlert Delete subject
+function confirmDeleteSubject(event, form) {
+    event.preventDefault();
+    Swal.fire({
+        title: 'Are you sure you want to delete this subject?',
+        text: 'This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endsection

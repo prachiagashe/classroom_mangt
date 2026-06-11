@@ -373,7 +373,9 @@ class FeesController extends Controller
             $finalFees = $enquiry?->final_fees ?? $admission->total_fee ?? 0;
             
             $newCount = intval($request->installment_count);
-            $newAmount = $finalFees / max(1, $newCount);
+            $totalPaid = $admission->paid_amount ?? 0;
+            $pendingAmount = max(0, $finalFees - $totalPaid);
+            $newAmount = $pendingAmount / max(1, $newCount);
 
             $admission->update([
                 'installment_count' => $newCount,

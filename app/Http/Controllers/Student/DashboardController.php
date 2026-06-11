@@ -133,8 +133,18 @@ class DashboardController extends Controller
                 ->orderBy('period_number')
                 ->get();
             
-            $todayTimetable->transform(function($entry) use ($classNumber) {
+            $periodTimings = Timetable::where('class_name', $classNumber)
+                ->where('day', 'period_timing')
+                ->published()
+                ->get()
+                ->keyBy('period_number');
+            
+            $todayTimetable->transform(function($entry) use ($classNumber, $periodTimings) {
                 $entry->room = "Room " . ($classNumber * 100 + $entry->period_number);
+                
+                $timing = $periodTimings->get($entry->period_number);
+                $entry->start_time = $timing ? $timing->start_time : null;
+                $entry->end_time = $timing ? $timing->end_time : null;
                 
                 if ($entry->start_time && $entry->end_time) {
                     $nowTime = Carbon::now()->format('H:i:s');

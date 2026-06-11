@@ -549,7 +549,15 @@ class AdmissionController extends Controller
             $updateData['installment_count'] = $installmentCount;
             $updateData['installment_type'] = $request->installment_duration;
             $updateData['installment_start_date'] = $request->installment_start_date;
-            $updateData['installment_amount'] = $finalFees / max($installmentCount, 1);
+            
+            // Calculate pending amount: Final Fees - Paid Amount
+            $totalPaid = $admission->paid_amount ?? 0;
+            if (!$hasPayments && $request->payment_mode === 'installment') {
+                $totalPaid += floatval($request->first_payment_amount ?? 0);
+            }
+            $pendingAmount = max(0, $finalFees - $totalPaid);
+            
+            $updateData['installment_amount'] = $pendingAmount / max($installmentCount, 1);
         }
 
         try {

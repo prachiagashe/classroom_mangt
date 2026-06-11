@@ -246,8 +246,7 @@
                             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Lecture Time</th>
                             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Subject Name</th>
                             <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Teacher Name</th>
-                            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Room/Class</th>
-                            <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -257,8 +256,12 @@
                                     Period #{{ $lecture->period_number }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                                    {{ $lecture->start_time ? Carbon\Carbon::parse('1970-01-01 ' . $lecture->start_time)->format('h:i A') : 'N/A' }} - 
-                                    {{ $lecture->end_time ? Carbon\Carbon::parse('1970-01-01 ' . $lecture->end_time)->format('h:i A') : 'N/A' }}
+                                    @if($lecture->start_time && $lecture->end_time)
+                                        {{ Carbon\Carbon::parse('1970-01-01 ' . $lecture->start_time)->format('H:i') }} - 
+                                        {{ Carbon\Carbon::parse('1970-01-01 ' . $lecture->end_time)->format('H:i') }}
+                                    @else
+                                        Time Not Assigned
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-2">
@@ -269,27 +272,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
                                     {{ $lecture->subject->teacher_name ?? 'N/A' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                        {{ $lecture->room }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($lecture->lecture_status === 'Ongoing')
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 badge-pulse">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                            Ongoing
-                                        </span>
-                                    @elseif($lecture->lecture_status === 'Upcoming')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                                            Upcoming
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
-                                            Completed
-                                        </span>
-                                    @endif
-                                </td>
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -305,20 +288,7 @@
                                 <span class="text-xs font-bold text-gray-500">Period #{{ $lecture->period_number }}</span>
                                 <h3 class="text-sm font-bold text-gray-900 mt-0.5">{{ $lecture->subject->name ?? 'N/A' }}</h3>
                             </div>
-                            @if($lecture->lecture_status === 'Ongoing')
-                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 badge-pulse">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                    Ongoing
-                                </span>
-                            @elseif($lecture->lecture_status === 'Upcoming')
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                    Upcoming
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
-                                    Completed
-                                </span>
-                            @endif
+
                         </div>
                         <div class="grid grid-cols-2 gap-3 text-xs pt-3 border-t border-gray-100">
                             <div>
@@ -326,14 +296,14 @@
                                 <span class="font-semibold text-gray-700 mt-0.5 block">{{ $lecture->subject->teacher_name ?? 'N/A' }}</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block font-medium">Classroom</span>
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mt-0.5">{{ $lecture->room }}</span>
-                            </div>
-                            <div class="col-span-2">
                                 <span class="text-gray-400 block font-medium">Timing</span>
                                 <span class="font-medium text-gray-600 mt-0.5 block">
-                                    {{ $lecture->start_time ? Carbon\Carbon::parse('1970-01-01 ' . $lecture->start_time)->format('h:i A') : 'N/A' }} - 
-                                    {{ $lecture->end_time ? Carbon\Carbon::parse('1970-01-01 ' . $lecture->end_time)->format('h:i A') : 'N/A' }}
+                                    @if($lecture->start_time && $lecture->end_time)
+                                        {{ Carbon\Carbon::parse('1970-01-01 ' . $lecture->start_time)->format('H:i') }} - 
+                                        {{ Carbon\Carbon::parse('1970-01-01 ' . $lecture->end_time)->format('H:i') }}
+                                    @else
+                                        Time Not Assigned
+                                    @endif
                                 </span>
                             </div>
                         </div>
