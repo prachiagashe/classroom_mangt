@@ -286,6 +286,7 @@ async function loadNotifications() {
         notificationList.classList.remove('hidden');
     }
 }
+const PAGE_LOAD_TIME = new Date();
 let lastUnreadCount = 0;
 
 async function checkNotificationCount() {
@@ -302,7 +303,58 @@ async function checkNotificationCount() {
         }
         
         const data = await response.json();
-        const currentCount = data.unread_count || 0;
+        let currentCount = data.unread_count || 0;
+        
+        // Auto-read logic if user is on the relevant page
+        if (data.notifications && data.notifications.length > 0) {
+            const currentPath = window.location.pathname + window.location.search;
+            const currentPathNoSearch = window.location.pathname;
+            let markedAny = false;
+            let shouldRefresh = false;
+            
+            data.notifications.forEach(notification => {
+                let actionUrl = '#';
+                if (notification.data && notification.data.redirect_url) {
+                    actionUrl = notification.data.redirect_url;
+                } else {
+                    if (notification.type === 'leave_request') {
+                        let leaveId = notification.data && notification.data.leave_request_id ? notification.data.leave_request_id : '';
+                        actionUrl = `/admin/leave?tab=leaves&leave_id=${leaveId}`;
+                    } else if (notification.type === 'leave_status') {
+                        actionUrl = '/teacher/leaves';
+                    } else if (notification.type === 'ptm') {
+                        actionUrl = '/student/ptm/meetings';
+                    } else if (notification.type === 'doubt') {
+                        actionUrl = '/student/doubt-sessions';
+                    } else if (notification.type === 'timetable') {
+                        actionUrl = '/student/timetable';
+                    } else if (notification.type === 'subject') {
+                        actionUrl = '/student/courses';
+                    }
+                }
+                
+                const isMatch = actionUrl !== '#' && (actionUrl === currentPath || actionUrl === currentPathNoSearch || currentPath.startsWith(actionUrl + '/') || currentPath.startsWith(actionUrl + '?'));
+                
+                if (isMatch && !notification.is_read) {
+                    // Mark as read silently
+                    markIndividualNotificationAsRead(notification.id, true);
+                    currentCount--;
+                    markedAny = true;
+                    
+                    // If notification was created after page load, refresh to show new data
+                    if (new Date(notification.created_at) > PAGE_LOAD_TIME) {
+                        shouldRefresh = true;
+                    }
+                }
+            });
+            
+            if (markedAny) {
+                currentCount = Math.max(0, currentCount);
+                if (shouldRefresh) {
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            }
+        }
         
         const badge = document.getElementById('notificationBadge');
         
@@ -363,7 +415,7 @@ function markNotificationsAsRead() {
     });
 }
 
-function markIndividualNotificationAsRead(notificationId) {
+function markIndividualNotificationAsRead(notificationId, silent = false) {
     // Send to server to mark as read
     fetch('/api/notifications/mark-read', {
         method: 'POST',
@@ -379,7 +431,7 @@ function markIndividualNotificationAsRead(notificationId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.success && !silent) {
             // Update UI by removing the notification completely
             const notificationElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
             if (notificationElement) {

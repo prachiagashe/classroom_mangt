@@ -18,25 +18,24 @@
         @csrf
         
         @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div id="success-message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {{ session('error') }}
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: `
+                                <ul class="text-left text-sm text-red-600 list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            `,
+                            confirmButtonColor: '#d33',
+                        });
+                    }
+                });
+            </script>
         @endif
 
         <!-- Enquiry Info - Top Row -->
@@ -534,7 +533,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
-    const successMessage = document.getElementById('success-message');
 
     // Auto-capitalize first letter of text inputs and textareas
     document.querySelectorAll('input[type="text"], textarea').forEach(input => {
@@ -553,15 +551,8 @@ document.addEventListener('DOMContentLoaded', function () {
             this.checked = false;
         });
     });
-    
-    // Auto-hide success message
-    if (successMessage) {
-        setTimeout(() => {
-            successMessage.style.transition = 'opacity 0.5s ease-out';
-            successMessage.style.opacity = '0';
-            setTimeout(() => successMessage.remove(), 500);
-        }, 5000);
-    }
+
+    // Removed auto-hide success message logic because it now uses SweetAlert
 
     // Helper: Show error
     function showError(fieldId, message) {

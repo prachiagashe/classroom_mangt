@@ -61,7 +61,7 @@
         <li>
             <a href="{{ route('teacher.assignments') }}"
                class="flex items-center gap-3 px-3 py-2 rounded transition
-               {{ request()->routeIs('teacher.assignments')
+               {{ request()->routeIs('teacher.assignments*')
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

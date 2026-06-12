@@ -38,7 +38,7 @@
         inset: 0;
         background-color: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(4px);
-        z-index: 9999;
+        z-index: 1050;
         display: none;
         align-items: center;
         justify-content: center;
@@ -685,16 +685,15 @@ function updateCalendar() {
     });
 
     if (currentMonthHolidays.length > 0) {
-        holidayListHTML = `<h5 class="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3">Holidays in ${monthNames[month]} ${year}</h5><div class="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">`;
+        holidayListHTML = `<h5 class="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-3">Declared Holidays for ${monthNames[month]} ${year}</h5><div class="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">`;
         currentMonthHolidays.sort((a, b) => new Date(a.holiday_date) - new Date(b.holiday_date))
                 .forEach(h => {
+                    const hDateObj = new Date(h.holiday_date);
+                    const formattedDate = `${hDateObj.getDate()} ${monthNames[hDateObj.getMonth()]} ${hDateObj.getFullYear()}`;
                     holidayListHTML += `
                         <div class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-100 shadow-sm">
-                            <span class="text-lg">🎉</span>
-                            <div>
-                                <p class="text-[11px] font-black text-gray-900">${h.holiday_date}</p>
-                                <p class="text-[10px] font-bold text-gray-500">${h.reason}</p>
-                            </div>
+                            <span class="text-green-500 font-bold">✓</span>
+                            <p class="text-[11px] font-bold text-gray-900">${formattedDate} - ${h.reason}</p>
                         </div>
                     `;
                 });
@@ -712,32 +711,35 @@ function updateCalendar() {
     }
     
     for (let i = 1; i <= lastDay.getDate(); i++) {
+        const dateObj = new Date(year, month, i);
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const isToday = (i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear());
+        const isSunday = dateObj.getDay() === 0;
         
-        // Count leaves for this date
-        const leaveCount = leaveRequests.filter(req => {
-            return req.status === 'approved' && dateStr >= req.start_date && dateStr <= req.end_date;
-        }).length;
-
         // Check if it's a holiday
         const holiday = holidays.find(h => h.holiday_date === dateStr);
 
-        let dayClass = 'bg-white text-gray-900 text-center py-4 text-sm hover:bg-blue-50 cursor-pointer relative transition-all group border-gray-100';
-        if (isToday) dayClass += ' bg-blue-50/50 ring-1 ring-inset ring-blue-600 font-black';
-        if (holiday) dayClass += ' bg-indigo-50 !text-indigo-700 font-bold';
+        let dayClass = 'bg-white text-gray-900 text-center py-4 text-sm relative transition-all group border-gray-100';
+        
+        if (isSunday && !holiday) {
+            dayClass += ' bg-red-50 !text-red-600 font-bold cursor-default';
+        } else if (holiday) {
+            dayClass += ' bg-indigo-50 !text-indigo-700 font-bold cursor-pointer hover:bg-indigo-100';
+        } else {
+            dayClass += ' hover:bg-blue-50 cursor-pointer';
+        }
+        
+        if (isToday) dayClass += ' ring-1 ring-inset ring-blue-600';
+        
+        const clickHandler = isSunday && !holiday ? '' : `onclick="handleDateClick('${dateStr}')"`;
+        const titleText = holiday ? `Holiday: ${holiday.reason}` : (isSunday ? 'Sunday' : '');
         
         days += `
-            <div class="${dayClass}" onclick="handleDateClick('${dateStr}')" title="${holiday ? 'Holiday: ' + holiday.reason : ''}">
+            <div class="${dayClass}" ${clickHandler} title="${titleText}">
                 <span class="relative z-10">${i}</span>
                 ${holiday ? `<div class="absolute top-1 right-1 text-[10px]">🎈</div>` : ''}
-                ${leaveCount > 0 ? `
-                    <div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
-                        <span class="w-1 h-1 rounded-full bg-red-500"></span>
-                        <span class="text-[8px] font-black text-red-600">${leaveCount}</span>
-                    </div>
-                ` : ''}
-                <div class="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                ${isSunday && !holiday ? `<div class="absolute top-1 right-1 text-[10px] text-red-500">S</div>` : ''}
+                ${(!isSunday || holiday) ? `<div class="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>` : ''}
             </div>`;
     }
     
@@ -755,15 +757,26 @@ function handleDateClick(date) {
         const holidays = @json($holidays);
         const existingHoliday = holidays.find(h => h.holiday_date === date);
         
+        const dateObj = new Date(date);
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const formattedDate = `${dateObj.getDate()} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+        
         if (existingHoliday) {
-            alert(`Duplicate Holiday: ${date} is already declared as "${existingHoliday.reason}"`);
+            Swal.fire({
+                icon: 'warning',
+                title: 'Duplicate Holiday',
+                text: `${formattedDate} is already declared as "${existingHoliday.reason}"`,
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
             document.getElementById('selectedHolidayDate').value = date;
-            document.getElementById('displayHolidayDate').value = `${date} (${existingHoliday.reason})`;
+            document.getElementById('displayHolidayDate').value = `${formattedDate} (${existingHoliday.reason})`;
             document.getElementById('holidayReason').value = existingHoliday.reason;
             document.getElementById('saveHolidayBtn').disabled = false;
         } else {
             document.getElementById('selectedHolidayDate').value = date;
-            document.getElementById('displayHolidayDate').value = date;
+            document.getElementById('displayHolidayDate').value = formattedDate;
             document.getElementById('holidayReason').value = '';
             document.getElementById('saveHolidayBtn').disabled = false;
         }
@@ -818,16 +831,34 @@ document.getElementById('holidayForm').addEventListener('submit', async function
 
         const result = await response.json();
         if (result.success) {
-            alert(result.message);
-            window.location.reload();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: result.message,
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
         } else {
-            alert('Error: ' + result.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.message,
+                showConfirmButton: true
+            });
             btn.disabled = false;
             btn.innerText = originalText;
         }
     } catch (error) {
         console.error('Holiday Save Error:', error);
-        alert('An error occurred.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while saving the holiday.',
+            showConfirmButton: true
+        });
         btn.disabled = false;
         btn.innerText = originalText;
     }

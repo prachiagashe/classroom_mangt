@@ -71,17 +71,20 @@ class NotificationController extends Controller
     public function checkNew()
     {
         $user = Auth::user();
-        $unreadCount = Notification::where('user_id', $user->id)
+        $query = Notification::where('user_id', $user->id)
             ->where(function($q) use ($user) {
                 $q->where('sender_id', '!=', $user->id)
                   ->orWhereNull('sender_id');
             })
-            ->where('is_read', false)
-            ->count();
+            ->where('is_read', false);
+
+        $unreadCount = $query->count();
+        $notifications = $query->latest()->take(10)->get();
 
         return response()->json([
             'has_new' => $unreadCount > 0,
-            'unread_count' => $unreadCount
+            'unread_count' => $unreadCount,
+            'notifications' => $notifications
         ]);
     }
 }

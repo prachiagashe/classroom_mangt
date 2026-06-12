@@ -70,7 +70,7 @@
             </li>
 
             <!-- Schedule -->
-            <li>
+            <!-- <li>
                 <a href="{{ route('student.schedule') }}"
                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
                    {{ request()->routeIs('student.schedule')
@@ -81,7 +81,7 @@
                     </svg>
                     <span class="font-medium">Schedule</span>
                 </a>
-            </li>
+            </li> -->
 
             <!-- Timetable -->
             <li>
