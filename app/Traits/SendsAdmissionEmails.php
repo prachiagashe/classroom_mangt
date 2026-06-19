@@ -35,7 +35,7 @@ trait SendsAdmissionEmails
         Log::info("Attempting to send premium admission confirmation email to: {$email} for student: {$studentName}");
 
         try {
-            $subject = "Admission Confirmation – Bansal Classes";
+            $subject = "Admission Confirmation – StudyFlow Classes";
             
             Mail::send('emails.admission-confirmed', [
                 'studentName' => $studentName,
@@ -78,7 +78,7 @@ trait SendsAdmissionEmails
         Log::info("Attempting to send premium admission rejection email to: {$email} for student: {$studentName}");
 
         try {
-            $subject = "Admission Status Update – Bansal Classes";
+            $subject = "Admission Status Update – StudyFlow Classes";
             
             Mail::send('emails.admission-rejected', [
                 'studentName' => $studentName,
@@ -115,7 +115,7 @@ trait SendsAdmissionEmails
         Log::info("Attempting to send student login credentials email to: {$email} for student: {$studentName}");
 
         try {
-            $subject = "Your Student Account Credentials – Bansal Classes";
+            $subject = "Your Student Account Credentials – StudyFlow Classes";
             
             Mail::send('emails.student-credentials', [
                 'studentName' => $studentName,

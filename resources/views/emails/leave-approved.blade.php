@@ -36,11 +36,11 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <h1>Leave Request Approved</h1>
-                    <p>Bansal Classes – Official Notification</p>
+                    <p>StudyFlow Classes – Official Notification</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $employeeName }}</strong>,
@@ -71,8 +71,8 @@
                 </p>
                 
                 <div class="footer">
-                    <p style="margin: 0;">This is an automated notification from Bansal Classes CRM.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 0;">This is an automated notification from StudyFlow Classes CRM.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

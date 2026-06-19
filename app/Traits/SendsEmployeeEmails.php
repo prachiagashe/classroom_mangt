@@ -36,7 +36,7 @@ trait SendsEmployeeEmails
         Log::info("Attempting to send premium employment confirmation email to: {$email} for employee: {$employeeName}");
 
         try {
-            $subject = "Employment Confirmation – Bansal Classes";
+            $subject = "Employment Confirmation – StudyFlow Classes";
             
             Mail::send('emails.employee-confirmation', [
                 'employeeName' => $employeeName,
@@ -86,7 +86,7 @@ trait SendsEmployeeEmails
         Log::info("Attempting to send premium salary payment email to: {$email} for employee: {$employeeName}");
 
         try {
-            $subject = "Salary Disbursed – Bansal Classes";
+            $subject = "Salary Disbursed – StudyFlow Classes";
             
             Mail::send('emails.salary-payment', [
                 'employeeName' => $employeeName,
@@ -129,7 +129,7 @@ trait SendsEmployeeEmails
         Log::info("Attempting to send leave {$status} email to: {$email} for employee: {$employeeName}");
 
         try {
-            $subject = "Leave Request {$statusLabel} – Bansal Classes";
+            $subject = "Leave Request {$statusLabel} – StudyFlow Classes";
             
             $view = $status === 'approved' ? 'emails.leave-approved' : 'emails.leave-rejected';
             
@@ -167,7 +167,7 @@ trait SendsEmployeeEmails
         Log::info("Attempting to send teacher password setup email to: {$email}");
 
         try {
-            $subject = "Teacher Account Setup – Bansal Classes";
+            $subject = "Teacher Account Setup – StudyFlow Classes";
             
             Mail::send('emails.teacher-setup', [
                 'employeeName' => $employeeName,

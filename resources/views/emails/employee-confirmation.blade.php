@@ -36,17 +36,17 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <h1>Welcome to the Team</h1>
-                    <p>Bansal Classes – Official Onboarding</p>
+                    <p>StudyFlow Classes – Official Onboarding</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $employeeName }}</strong>,
                 </p>
                 <p class="body-text">
-                    Congratulations! It is our great pleasure to officially welcome you to <strong>Bansal Classes</strong>. We are excited to have you join our mission of academic excellence.
+                    Congratulations! It is our great pleasure to officially welcome you to <strong>StudyFlow Classes</strong>. We are excited to have you join our mission of academic excellence.
                 </p>
                 
                 <div class="card">
@@ -79,8 +79,8 @@
                 </p>
                 
                 <div class="footer">
-                    <p style="margin: 0;">This is an automated onboarding notification from Bansal Classes CRM.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 0;">This is an automated onboarding notification from StudyFlow Classes CRM.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

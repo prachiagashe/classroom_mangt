@@ -36,17 +36,17 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <h1>Status Update</h1>
-                    <p>Bansal Classes – Admission Department</p>
+                    <p>StudyFlow Classes – Admission Department</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $studentName }}</strong>,
                 </p>
                 <p class="body-text">
-                    Thank you for your interest in Bansal Classes. After reviewing your admission enquiry for <strong>{{ $className }}</strong>, we regret to inform you that we are unable to approve your admission request at this time.
+                    Thank you for your interest in StudyFlow Classes. After reviewing your admission enquiry for <strong>{{ $className }}</strong>, we regret to inform you that we are unable to approve your admission request at this time.
                 </p>
                 
                 <div class="card">
@@ -67,8 +67,8 @@
                 </p>
                 
                 <div class="footer">
-                    <p style="margin: 0;">This is an automated message from Bansal Classes CRM.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 0;">This is an automated message from StudyFlow Classes CRM.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

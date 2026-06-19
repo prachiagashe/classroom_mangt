@@ -13,7 +13,7 @@
                 Set Your Password
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
-                Welcome to Bansal Classes CRM! Please set your password to access your account.
+                Welcome to StudyFlow Classes CRM! Please set your password to access your account.
             </p>
         </div>
         

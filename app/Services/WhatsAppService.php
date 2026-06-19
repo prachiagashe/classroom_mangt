@@ -47,7 +47,7 @@ class WhatsAppService
      */
     protected function prepareMessageData($type, $model, $extra)
     {
-        $instituteName = env('INSTITUTE_NAME', 'Bansal Classes');
+        $instituteName = env('INSTITUTE_NAME', 'StudyFlow Classes');
         $phone = null;
         $message = null;
         $enquiryId = null;
@@ -82,7 +82,7 @@ class WhatsAppService
             case 'new_enquiry':
                 $message = "Hello {$parentName},
 
-Greetings from Bansal Classes!
+Greetings from StudyFlow Classes!
 
 Thank you for your interest in our courses. We specialize in guiding students towards success in JEE/NEET and other competitive exams.
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bansal Classes CRM - Login</title>
+    <title>StudyFlow Classes CRM - Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{-- Tailwind CDN --}}
@@ -24,7 +24,7 @@
                  class="w-12 h-12 object-contain">
         </div>
         <div>
-            <h2 class="font-bold text-lg">Bansal Classes</h2>
+            <h2 class="font-bold text-lg">StudyFlow Classes</h2>
             <p class="text-sm text-gray-500">CRM & Management System</p>
         </div>
     </div>
@@ -67,7 +67,7 @@
                     Empowering Students to Achieve Excellence
                 </h1>
                 <p class="text-gray-600 max-w-md mx-auto">
-                    Join thousands of successful students who have transformed their careers with Bansal Classes' comprehensive educational programs.
+                    Join thousands of successful students who have transformed their careers with StudyFlow Classes' comprehensive educational programs.
                 </p>
                 <!-- Stats -->
                 <div class="flex justify-center gap-8 pt-4">
@@ -103,7 +103,7 @@
                         Login to Dashboard
                     </h2>
                     <p class="text-sm text-gray-600">
-                        Access your Bansal Classes CRM account
+                        Access your StudyFlow Classes CRM account
                     </p>
                 </div>
 
@@ -205,7 +205,7 @@
 <footer class="bg-white border-t border-gray-200 py-4">
     <div class="text-center">
         <p class="text-sm text-gray-600">
-            © 2026 Bansal Classes. Excellence in Education.
+            © 2026 StudyFlow Classes. Excellence in Education.
         </p>
     </div>
 </footer>

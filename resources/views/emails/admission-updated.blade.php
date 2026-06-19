@@ -41,7 +41,7 @@
             <div class="content">
                 <!-- Logo Section -->
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
 
                 <div class="header">
@@ -145,9 +145,9 @@
         </div>
 
             <div class="footer">
-                <p>This is an automated notification from {{ config('app.name', 'Bansal Classes') }}.</p>
+                <p>This is an automated notification from {{ config('app.name', 'StudyFlow Classes') }}.</p>
                 <p>If you have any questions, please contact our administration.</p>
-                <p>&copy; {{ date('Y') }} {{ config('app.name', 'Bansal Classes') }}. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ config('app.name', 'StudyFlow Classes') }}. All rights reserved.</p>
             </div>
         </div>
     </div>

@@ -36,7 +36,7 @@ trait SendsAuthEmails
         Log::info("Attempting to send registration confirmation email to: {$email} for {$role}: {$userName}");
 
         try {
-            $subject = "Account Created Successfully – Bansal Classes";
+            $subject = "Account Created Successfully – StudyFlow Classes";
             $loginUrl = route('login');
             
             Mail::send('emails.registration-confirmation', [

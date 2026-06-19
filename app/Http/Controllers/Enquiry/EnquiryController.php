@@ -409,7 +409,7 @@ public function confirm($id)
                                 \App\Services\NotificationService::notifyUser(
                                     $newUser->id,
                                     'Admission Confirmed',
-                                    "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
+                                    "Welcome to StudyFlow Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
                                     'admission',
                                     ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
                                 );
@@ -427,7 +427,7 @@ public function confirm($id)
                             \App\Services\NotificationService::notifyStudentByEmail(
                                 $enquiry->email,
                                 'Admission Confirmed',
-                                "Welcome to Bansal Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
+                                "Welcome to StudyFlow Classes! Your admission for Class {$className} has been confirmed. Roll No: {$rollNumber}.",
                                 'admission',
                                 ['admission_id' => $admission->id, 'roll_number' => $rollNumber]
                             );

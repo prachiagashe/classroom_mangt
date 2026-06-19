@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Forgot Password - Bansal Classes</title>
+    <title>Forgot Password - StudyFlow Classes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
                 <img src="{{ asset('images/icon.png') }}" alt="Logo" class="w-12 h-12 object-contain">
             </div>
             <div>
-                <h2 class="font-bold text-lg">Bansal Classes</h2>
+                <h2 class="font-bold text-lg">StudyFlow Classes</h2>
                 <p class="text-sm text-gray-500">CRM & Management System</p>
             </div>
         </div>

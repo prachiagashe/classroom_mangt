@@ -35,18 +35,16 @@
         <div class="container">
             <div class="top-bar"></div>
             <div class="content">
-                <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
-                </div>
+
                 <div class="header">
                     <h1>Admission Confirmed</h1>
-                    <p>Bansal Classes – Excellence through Education</p>
+                    <p>StudyFlow Classes – Excellence through Education</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $studentName }}</strong>,
                 </p>
                 <p class="body-text">
-                    We are absolutely thrilled to welcome you to <strong>Bansal Classes</strong>. Your admission request has been successfully processed and confirmed.
+                    We are absolutely thrilled to welcome you to <strong>StudyFlow Classes</strong>. Your admission request has been successfully processed and confirmed.
                 </p>
                 
                 <div class="card">
@@ -71,8 +69,8 @@
                 </p>
                 
                 <div class="footer">
-                    <p style="margin: 0;">This is an automated message from Bansal Classes CRM.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 0;">This is an automated message from StudyFlow Classes CRM.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

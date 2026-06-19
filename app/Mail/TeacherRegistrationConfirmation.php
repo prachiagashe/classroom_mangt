@@ -38,7 +38,7 @@ class TeacherRegistrationConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Teacher Registration Successful - Bansal Classes',
+            subject: 'Teacher Registration Successful - StudyFlow Classes',
         );
     }
 
