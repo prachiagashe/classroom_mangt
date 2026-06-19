@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Student Dashboard | Bansal Classes')
+@section('title', 'Student Dashboard | StudyFlow Classes')
 
 @section('page-title', 'Dashboard')
 
@@ -52,7 +52,7 @@
             <div class="space-y-3">
                 <div class="flex items-center gap-3">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white tracking-wide uppercase shadow-sm">
-                        Bansal Classes
+                        StudyFlow Classes
                     </span>
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-glass text-blue-200 border border-white/10">
                         {{ $courseType }}
@@ -658,7 +658,7 @@
             
             <div class="px-6 py-6 space-y-4 max-h-[400px] overflow-y-auto">
                 <p class="text-xs text-gray-500 leading-relaxed">
-                    Download core formulas, quick study guides, and mock prep handbooks curated by the Bansal Classes department.
+                    Download core formulas, quick study guides, and mock prep handbooks curated by the StudyFlow Classes department.
                 </p>
                 
                 <!-- Mock Materials List -->

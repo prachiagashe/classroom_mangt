@@ -40,7 +40,7 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <div class="icon-circle">
@@ -49,7 +49,7 @@
                         </svg>
                     </div>
                     <h1>Registration Successful</h1>
-                    <p>Welcome to Bansal Classes CRM</p>
+                    <p>Welcome to StudyFlow Classes CRM</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $userName }}</strong>,
@@ -84,8 +84,8 @@
                 </p>
                 
                 <div class="footer">
-                    <p style="margin: 0;">This is an automated message from Bansal Classes CRM.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 0;">This is an automated message from StudyFlow Classes CRM.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

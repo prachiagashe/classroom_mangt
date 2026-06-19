@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
-    <title>@yield('title', 'Bansal Classes')</title>
+    <title>@yield('title', 'StudyFlow Classes')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     {{-- CSRF Token for AJAX --}}

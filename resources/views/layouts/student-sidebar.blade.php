@@ -17,7 +17,7 @@
         </div>
 
         <div>
-            <h6 class="mb-0 font-bold text-white">Bansal Classes</h6>
+            <h6 class="mb-0 font-bold text-white">StudyFlow Classes</h6>
             <small class="text-purple-200">Student Portal</small>
         </div>
     </div>

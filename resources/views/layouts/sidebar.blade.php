@@ -9,7 +9,7 @@
 </div>
 
         <div>
-            <h6 class="mb-0 font-bold">Bansal Classes</h6>
+            <h6 class="mb-0 font-bold">StudyFlow Classes</h6>
             <small class="text-gray-400">CRM System</small>
         </div>
     </div>
