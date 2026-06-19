@@ -32,7 +32,7 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <h1>Welcome, Professor!</h1>
@@ -57,7 +57,7 @@
                 </p>
 
                 <div class="footer">
-                    <p>&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p>&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

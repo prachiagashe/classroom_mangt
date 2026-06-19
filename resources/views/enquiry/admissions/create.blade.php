@@ -8,7 +8,7 @@
     <div class="border-2 border-gray-800 p-6 mb-6">
         <!-- Centered Institute Name -->
         <div class="text-center mb-6">
-            <h1 class="text-xl font-bold uppercase">BANSAL CLASSES PRIVATE LIMITED</h1>
+            <h1 class="text-xl font-bold uppercase">StudyFlow Classes PRIVATE LIMITED</h1>
             <p class="text-sm">BCPL, 2nd Floor, R.B. Ingle Plaza, Nanded City, Pune</p>
         </div>
         
@@ -320,7 +320,7 @@
         <div class="border border-black p-4 mb-6">
             <h3 class="text-sm font-bold mb-3">Refund Policy :</h3>
             <div class="text-xs leading-relaxed space-y-2">
-                <p class="mb-3">The system at BANSAL CLASSES PVT LTD works in a transparent manner and the fee once paid is not refundable under any circumstances. However, the management may consider the request for refund of fee under the following circumstances:</p>
+                <p class="mb-3">The system at StudyFlow Classes PVT LTD works in a transparent manner and the fee once paid is not refundable under any circumstances. However, the management may consider the request for refund of fee under the following circumstances:</p>
                 
                 <table class="w-full border-collapse border border-black text-xs">
                     <tr class="border border-black">
@@ -419,7 +419,7 @@
                 <h3 class="text-sm font-bold text-center">DECLARATION BY THE PARENTS</h3>
             </div>
             <div class="text-xs leading-relaxed space-y-2">
-                <p>I Mr./Mrs ______ request to Bansal Classes Pvt. Ltd. To enroll my ward ______ Master/Miss ______</p>
+                <p>I Mr./Mrs ______ request to StudyFlow Classes Pvt. Ltd. To enroll my ward ______ Master/Miss ______</p>
                 
                 <ol class="list-decimal list-inside space-y-1">
                     <li>Fees once paid are not refundable under any circumstances.</li>

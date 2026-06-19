@@ -37,17 +37,17 @@
             <div class="top-bar"></div>
             <div class="content">
                 <div class="logo-wrapper">
-                    <img src="{{ asset('images/icon.png') }}" alt="Bansal Classes Logo">
+                    <img src="{{ asset('images/icon.png') }}" alt="StudyFlow Classes Logo">
                 </div>
                 <div class="header">
                     <h1>Registration Successful</h1>
-                    <p>Welcome to Bansal Classes</p>
+                    <p>Welcome to StudyFlow Classes</p>
                 </div>
                 <p class="body-text">
                     Dear <strong>{{ $teacherName }}</strong>,
                 </p>
                 <p class="body-text">
-                    Your teacher account has been registered successfully. We are excited to have you onboard with Bansal Classes.
+                    Your teacher account has been registered successfully. We are excited to have you onboard with StudyFlow Classes.
                 </p>
                 
                 <div class="card">
@@ -81,7 +81,7 @@
                 
                 <div class="footer">
                     <p style="margin: 0;">This is an automated message, please do not reply to this email.</p>
-                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} Bansal Classes. All rights reserved.</p>
+                    <p style="margin: 4px 0;">&copy; {{ date('Y') }} StudyFlow Classes. All rights reserved.</p>
                 </div>
             </div>
         </div>

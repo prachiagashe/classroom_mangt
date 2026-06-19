@@ -5,7 +5,7 @@
 
     <!-- Header -->
     <div class="text-center mb-8 border-b pb-4">
-        <h1 class="text-2xl font-bold">BANSAL CLASSES PRIVATE LIMITED</h1>
+        <h1 class="text-2xl font-bold">StudyFlow Classes PRIVATE LIMITED</h1>
         <p class="text-sm text-gray-600">Rajasthan Kota's Pioneer Brand of India | Since 1981</p>
         <p class="text-sm text-gray-600">BCPL, 2nd Floor, R.B. Ingle Plaza, Nanded City, Pune</p>
         <h2 class="mt-4 text-lg font-semibold bg-gray-200 inline-block px-4 py-1 rounded">
