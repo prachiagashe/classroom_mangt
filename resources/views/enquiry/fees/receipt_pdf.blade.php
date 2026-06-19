@@ -167,9 +167,9 @@
                     }
                 @endphp
                 @if($logoSrc)
-                    <img src="{{ $logoSrc }}" alt="Bansal Classes" class="logo">
+                    <img src="{{ $logoSrc }}" alt="StudyFlow Classes" class="logo">
                 @else
-                    <h1 style="margin:0; font-size:20px; color:#1e3a8a;">Bansal Classes</h1>
+                    <h1 style="margin:0; font-size:20px; color:#1e3a8a;">StudyFlow Classes</h1>
                 @endif
             </td>
             <td class="receipt-title">
@@ -242,7 +242,7 @@
     <div class="footer">
         <p style="margin-bottom: 10px;">If you have any questions about this receipt, please contact the administration office.</p>
         
-        <p><strong>Bansal Classes</strong><br>
+        <p><strong>StudyFlow Classes</strong><br>
         Pune<br>
         Phone: +91 95450 90432</p>
         

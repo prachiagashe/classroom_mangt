@@ -73,7 +73,7 @@
         <table width="100%" style="margin-bottom: 15px;">
             <tr>
                 <td colspan="2" class="text-center">
-                    <h1 class="text-xl font-bold uppercase">BANSAL CLASSES PRIVATE LIMITED</h1>
+                    <h1 class="text-xl font-bold uppercase">StudyFlow Classes PRIVATE LIMITED</h1>
                     <p class="text-sm">BCPL, 2nd Floor, R.B. Ingle Plaza, Nanded City, Pune</p>
                     <p class="text-xs">Phone: 020-24491111 | Email: bansalclasses@gmail.com</p>
                 </td>
@@ -429,7 +429,7 @@
         <h2 class="text-lg font-bold text-center mb-4">REFUND POLICY</h2>
         
         <p class="text-xs mb-3">
-            The system at BANSAL CLASSES PVT LTD works in a transparent manner and the fee once paid is not refundable under any circumstances. However, the management may consider the request for refund of fee under the following circumstances:
+            The system at StudyFlow Classes PVT LTD works in a transparent manner and the fee once paid is not refundable under any circumstances. However, the management may consider the request for refund of fee under the following circumstances:
         </p>
         
         <table class="table mb-4">
@@ -527,7 +527,7 @@
                     I, the undersigned, parent/guardian of the student, hereby declare that:
                 </p>
                 <ol class="text-xs" style="padding-left: 20px; line-height: 1.4;">
-                    <li>1. I have read and understood all the rules and regulations of BANSAL CLASSES PVT LTD.</li>
+                    <li>1. I have read and understood all the rules and regulations of StudyFlow Classes PVT LTD.</li>
                     <li>2. I agree to abide by all the terms and conditions mentioned in the admission form.</li>
                     <li>3. I understand that the fees once paid are non-refundable as per the refund policy.</li>
                     <li>4. I ensure that my ward will maintain regular attendance and complete all assignments.</li>
@@ -571,7 +571,7 @@
             <h3 class="text-sm font-bold mb-3">DECLARATION BY STUDENT</h3>
             <div class="border p-3">
                 <p class="text-xs leading-relaxed mb-3">
-                    I, the undersigned, student of BANSAL CLASSES PVT LTD, hereby declare that:
+                    I, the undersigned, student of StudyFlow Classes PVT LTD, hereby declare that:
                 </p>
                 <ol class="text-xs" style="padding-left: 20px; line-height: 1.4;">
                     <li>1. I will follow all rules and regulations of the institute.</li>
@@ -618,7 +618,7 @@
             <h3 class="text-sm font-bold mb-3">UNDERTAKING</h3>
             <div class="border p-3">
                 <p class="text-xs leading-relaxed">
-                    We hereby undertake to pay all fees as per the fee structure of BANSAL CLASSES PVT LTD. We understand that non-payment of fees on time may lead to cancellation of admission. We agree to pay late fees as applicable for delayed payments.
+                    We hereby undertake to pay all fees as per the fee structure of StudyFlow Classes PVT LTD. We understand that non-payment of fees on time may lead to cancellation of admission. We agree to pay late fees as applicable for delayed payments.
                 </p>
                 
                 <table width="100%" style="margin-top: 15px;">

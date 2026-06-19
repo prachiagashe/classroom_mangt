@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bansal Classes - Enquiry Form</title>
+    <title>StudyFlow Classes - Enquiry Form</title>
     <style>
         @page {
             size: A4;
@@ -533,7 +533,7 @@
 </div>
                 <div class="brand-text">
                     <div class="brand-line1">Rajasthan Kota's Pioneer Brand of India</div>
-                    <div class="brand-line2">BANSAL CLASSES</div>
+                    <div class="brand-line2">StudyFlow Classes</div>
                     <div class="brand-line3">PRIVATE LIMITED</div>
                     <div class="brand-line4">
                         <span>Since : 1981</span>

@@ -23,13 +23,13 @@
                 <p class="text-gray-500">Manage and track all student enquiries</p>
             </div>
             <div class="flex gap-3 items-center">
-                 <a href="{{ route('admin.enquiry.form') }}"
+                 <!-- <a href="{{ route('admin.enquiry.form') }}"
                   class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2 mr-4">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Add Enquiry
-                </a>
+                </a> -->
                 <button onclick="openImportModal()"
                   class="bg-green-600 text-white px-5 py-2.5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +238,7 @@
                             if (empty($parentName) || preg_match('/^[0-9\s]+$/', $parentName)) {
                                 $parentName = 'Parent';
                             }
-                            $waText = "Hello {$parentName},\n\nGreetings from Bansal Classes!\n\nThank you for your interest in our courses. We specialize in guiding students towards success in JEE/NEET and other competitive exams.\n\nOur academic counselor would be happy to assist you with:\n• Course details\n• Fee structure\n• Batch timings\n• Admission process\n\nPlease let us know a convenient time to connect, or feel free to call us directly.\n\nWe look forward to helping your child achieve their goals!";
+                            $waText = "Hello {$parentName},\n\nGreetings from StudyFlow Classes!\n\nThank you for your interest in our courses. We specialize in guiding students towards success in JEE/NEET and other competitive exams.\n\nOur academic counselor would be happy to assist you with:\n• Course details\n• Fee structure\n• Batch timings\n• Admission process\n\nPlease let us know a convenient time to connect, or feel free to call us directly.\n\nWe look forward to helping your child achieve their goals!";
                         @endphp
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $enquiry->whatsapp ?: $enquiry->parent_mobile) }}?text={{ urlencode($waText) }}"
                            target="_blank"
@@ -255,7 +255,7 @@
 
                         <div class="border-t my-1"></div>
 
-                        <form action="{{ route('enquiry.enquiries.confirm', $enquiry->id) }}" method="POST" onsubmit="return handleConfirmSubmission(this, 'Confirm admission for {{ str_replace('\'', '\\\'', $enquiry->first_name) }}?')">
+                        <form action="{{ route('enquiry.enquiries.confirm', $enquiry->id) }}" method="POST" onsubmit="event.preventDefault(); handleConfirmAdmission(this, '{{ str_replace('\'', '\\\'', $enquiry->first_name) }}');">
                            @csrf
                             <button type="submit"
                                 class="flex items-center gap-3 px-4 py-2 text-green-600 hover:bg-green-50 w-full text-left">
@@ -263,11 +263,11 @@
                             </button>
                        </form>
 
-                        <form action="{{ route('enquiry.enquiries.reject', $enquiry->id) }}" method="POST">
+                        <form action="{{ route('enquiry.enquiries.reject', $enquiry->id) }}" method="POST" onsubmit="event.preventDefault(); handleRejectAdmission(this, '{{ str_replace('\'', '\\\'', $enquiry->first_name) }}');">
                            @csrf
                             <button type="submit"
                                   class="flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 w-full text-left">
-                            ✖ <span>Reject</span>
+                            ✖ <span class="btn-text">Reject</span>
                             </button>
                        </form>
                    </div>
@@ -847,17 +847,52 @@ document.addEventListener('click', function(e) {
     }
 });
 
-function handleConfirmSubmission(form, msg) {
-    if (!confirm(msg)) return false;
-    const btn = form.querySelector('button[type="submit"]');
-    if (btn) {
-        if (btn.disabled) return false;
-        btn.disabled = true;
-        btn.classList.add('opacity-50', 'cursor-not-allowed');
-        const textSpan = btn.querySelector('.btn-text') || btn;
-        textSpan.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 text-green-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
-    }
-    return true;
+function handleConfirmAdmission(form, name) {
+    Swal.fire({
+        title: `Confirm admission for ${name}?`,
+        text: "Are you sure you want to confirm this admission?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                const textSpan = btn.querySelector('.btn-text') || btn;
+                textSpan.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 text-green-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+            }
+            form.submit();
+        }
+    });
+}
+
+function handleRejectAdmission(form, name) {
+    Swal.fire({
+        title: `Reject admission for ${name}?`,
+        text: "Are you sure you want to reject this enquiry?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Reject',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                const textSpan = btn.querySelector('.btn-text') || btn;
+                textSpan.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 text-red-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+            }
+            form.submit();
+        }
+    });
 }
 </script>
 
